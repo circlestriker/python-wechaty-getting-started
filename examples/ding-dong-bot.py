@@ -40,7 +40,14 @@ async def on_message(msg: Message):
             name='ding-dong.jpg'
         )
         await msg.say(file_box)
-
+    elif msg.text() == '失眠':
+        await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
+    elif msg.text() == '抑郁':
+        await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
+    elif msg.text() == '学佛':
+        await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
+    elif msg.text() == '焦虑':
+        await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
 
 async def on_scan(
         qrcode: str,
