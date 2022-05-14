@@ -15,6 +15,7 @@ limitations under the License.
 """
 import os
 import asyncio
+#import logging
 
 from urllib.parse import quote
 
@@ -24,24 +25,49 @@ from wechaty import (
     Message,
     Wechaty,
     ScanStatus,
+    Room,
 )
 
+conversationDict = {}
 
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
+    groupId-keyword-string-cnt
     """
+    room = msg.room()
+    conversation_id = ''
+    if room is not None:
+        conversation_id = room.room_id #str
+    else:
+        talker = msg.talker()
+        if talker is None:
+            raise WechatyPayloadError('Message must be from room/contact')
+        conversation_id = talker.contact_id
+        
     if msg.text() == 'ding':
         await msg.say('dong')
-
-        file_box = FileBox.from_url(
-            'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/'
-            'u=1116676390,2305043183&fm=26&gp=0.jpg',
-            name='ding-dong.jpg'
-        )
-        await msg.say(file_box)
-    elif ('失眠' in msg.text()) or ('睡不着' in msg.text()):
-        await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
+        # file_box = FileBox.from_url(
+        #     'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/'
+        #     'u=1116676390,2305043183&fm=26&gp=0.jpg',
+        #     name='ding-dong.jpg'
+        # )
+        # await msg.say(file_box)
+    elif ('失眠' in msg.text()):
+        keyDic = conversationDict.get(conversation_id)
+        if keyDic is None:
+            print('该会话第一次回复|失眠|')
+            keyDic = {}
+            keyDic['失眠'] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
+        elif keyDic.get('失眠') is None:
+            print('该会话非第一次回复|失眠|')
+            print('keyDic:',keyDic.__dict__)
+            keyDic['失眠'] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
+            
     elif '抑郁' in msg.text():
         await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
     elif '学佛' in msg.text():
