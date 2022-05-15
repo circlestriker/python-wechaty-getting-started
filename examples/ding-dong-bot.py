@@ -30,6 +30,11 @@ from wechaty import (
 
 conversationDict = {}
 keyword2reply = {
+    '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
+    '学佛':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
+    '失眠':'失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg',
+    #足球#
     '防守':'防守型球星多的好处:https://mp.weixin.qq.com/s/s_Qfap5motEBSm-auc2v9g',
     '膝盖伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
     '脚踝伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
@@ -77,7 +82,7 @@ async def on_message(msg: Message):
         
     #replyOnKeyword(conversation_id, msg)
     for keyword in keyword2reply:
-        print('keyword: %s' %(keyword))
+        #print('keyword: %s' %(keyword))
         if (keyword in msg.text()):
             reply = keyword2reply.get(keyword)
             print('找到keyword: %s | %s' %(keyword, reply))
