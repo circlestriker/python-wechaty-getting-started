@@ -30,11 +30,79 @@ from wechaty import (
 
 conversationDict = {}
 keyword2reply = {
+    '观察者模式':'C++实现观察者模式:https://mp.weixin.qq.com/s/fQ3BFGoiTvb4mKQueb7hWQ',
+
+    '观世音':'比特币和观世音:https://mp.weixin.qq.com/s/dAjozxD7B90BpY7WLmnasg',
+
+    '道法自然':'[花魂黛玉]道法自然，把握阴阳:https://mp.weixin.qq.com/s/1xOiudL2S0R2n_Qblo_k5w',
+
+    '腾讯':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
+
+
+    '顽疾':'传统文化解决多年顽疾:https://mp.weixin.qq.com/s/BfeYHVFCx40ApIkr0wk9Ig',
+
+    '张三丰':'太极张三丰:https://mp.weixin.qq.com/s/W5yH_H8aG8TC_KQAHMgEYw',
+
+    '比特币':'红楼梦和比特币:https://mp.weixin.qq.com/s/-uJDmUmE8-z0egupBQzhUA',
+
+
+
+
+    '圣贤':'一点实践: 圣贤思想如何帮助人？:https://mp.weixin.qq.com/s/tVPmb9spfr8Zq0pkB8HUrQ',
+
+    '传统文化':'传统文化救人的又一例子:https://mp.weixin.qq.com/s/IY4t0cz1gLob82p6Etx24Q',
+
+    '曹雪芹':'曹雪芹暮年苦不苦？:https://mp.weixin.qq.com/s/Sk5QErgtiwXh475UiZRZXw',
+
+    '黛玉':'黛玉的美是怎样的？:https://mp.weixin.qq.com/s/otEsaw2YZk1QKKrO2PeCjg',
+
+    '公益图书馆':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
+    '布施':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
+
+    '新冠':'[悟空图书馆]-新冠如长夜:https://mp.weixin.qq.com/s/hvtpV04KHq25sXvWO7pJXA',
+
+    '绝望':'以毒攻毒:绝望中寻找希望:https://mp.weixin.qq.com/s/WlSeqHjVj4id6odDWGQeXQ',
+
+    '老师':'老师如再生父母，学生如生命延续:https://mp.weixin.qq.com/s/xLQlFfumIqzWDV0oBzUf5w',
+
+    '慕容复':'宝玉和慕容复为什么都魔怔?:https://mp.weixin.qq.com/s/A4glTxB6omaBddUFcD4eFg',
+
+    '父母吵架':'慕容复骂老爹:https://mp.weixin.qq.com/s/0XlKT4lsIpVvHGyACZHkvQ',
+
+    '悟空':'[悟空图书馆]-悟空的原型是谁:https://mp.weixin.qq.com/s/PUvgZzbxq6NN-F5GEMlk0w',
+
+
+    '慧能':'慧能神秀和诸葛亮司马懿:https://mp.weixin.qq.com/s/lmJ69lWD7dkF4pU5_5IjJg',
+
+    '医德':'德不近佛者不可以为医在说什么？:https://mp.weixin.qq.com/s/6edwtylKmsZmQ7Zg_6MRvg',
+    '雪诺':'黑暗牙签和光明使者:https://mp.weixin.qq.com/s/FyfAF2DNnn5NvPVOZBl1Zg',
+    '光明使者':'黑暗牙签和光明使者:https://mp.weixin.qq.com/s/FyfAF2DNnn5NvPVOZBl1Zg',
+
+
+
+    '玄奘':'唐太宗心理咨询玄奘:https://mp.weixin.qq.com/s/XtplxMxYVlaSFKE6Qbw3Nw',
+    '桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
+    '996':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg'
+    '加班':'黄帝内经之不妄作劳:https://mp.weixin.qq.com/s/f0z9e6i0swFjKwqJNYchkA',
+    '凤姐':'红楼梦算命之凤姐:https://mp.weixin.qq.com/s/0yYnnSxPv_-cYycp26zRZg',
+    #焦虑#
+    '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
     '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
     '学佛':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
     '失眠':'失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg',
     #足球#
+    '伤病':'伤病左右的友谊赛:https://mp.weixin.qq.com/s/tVPmb9spfr8Zq0pkB8HUrQ',
+    '绿茵场':'球场师徒缘:https://mp.weixin.qq.com/s/wq5M7busUmL8h1skLPuJ5Q',
+    '少林足球':'少林足球之无所住踢球:https://mp.weixin.qq.com/s/yOhLvqbUJ1IbaevDISKtlA',
+    '无所住':'少林足球之无所住踢球:https://mp.weixin.qq.com/s/yOhLvqbUJ1IbaevDISKtlA',
+    '传球':'舍得—费曼学习法和传球:https://mp.weixin.qq.com/s/rTpG5qMfhChXQ_PjGlrxuw',
+    '登山':'寒啸登山龙思踢球之亢龙有悔:https://mp.weixin.qq.com/s/gTA_hsU66JKiSyTl9RHdxQ',
+    '余地':'寒啸登山龙思踢球之亢龙有悔:https://mp.weixin.qq.com/s/gTA_hsU66JKiSyTl9RHdxQ',
+    '大罗':'降龙十八掌和大罗的射门:https://mp.weixin.qq.com/s/QIBL9OHiDjGsWTF-mDjflg',
+    '内马尔':'内马尔之钱太多不是好事:https://mp.weixin.qq.com/s/MxxGYp6YzOFtr5AXJUodHQ',
+    '河西球星':'兄弟缘之河西球星录(上):https://mp.weixin.qq.com/s/_FMHlNfj9IWJYLLfTOVHyA',
+    '苏神':'从苏牙到苏神https://mp.weixin.qq.com/s/PC18UGOs5YxZrhvCDI_IMw',
     '防守':'防守型球星多的好处:https://mp.weixin.qq.com/s/s_Qfap5motEBSm-auc2v9g',
     '膝盖伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
     '脚踝伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
@@ -101,71 +169,6 @@ async def on_message(msg: Message):
                 await msg.say(reply)
                 
             break #一个群一次只回复一个匹配
-
-    """    
-    if msg.text() == 'ding':
-        await msg.say('dong')
-    elif ('失眠' in msg.text()):
-        keyDic = conversationDict.get(conversation_id)
-        if keyDic is None:
-            print('该会话第一次回复|失眠|')
-            keyDic = {}
-            keyDic['失眠'] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
-        elif keyDic.get('失眠') is None:
-            print('该会话非第一次回复|失眠|')
-            print('keyDic:',keyDic.__dict__)
-            keyDic['失眠'] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
-            
-    elif '抑郁' in msg.text():
-        keyword = '抑郁'
-        keyDic = conversationDict.get(conversation_id)
-        if keyDic is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            keyDic = {}
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
-        elif keyDic.get(keyword) is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            print('keyDic:',keyDic.__dict__)
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
-    elif '学佛' in msg.text():
-        keyword = '学佛'
-        keyDic = conversationDict.get(conversation_id)
-        if keyDic is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            keyDic = {}
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
-        elif keyDic.get(keyword) is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            print('keyDic:',keyDic.__dict__)
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
-    elif '焦虑' in msg.text():
-        keyword = '焦虑'
-        keyDic = conversationDict.get(conversation_id)
-        if keyDic is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            keyDic = {}
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
-        elif keyDic.get(keyword) is None:
-            print('该会话第一次回复|%s|' %(keyword))
-            print('keyDic:',keyDic.__dict__)
-            keyDic[keyword] = 1
-            conversationDict[conversation_id] = keyDic
-            await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
-    """
 
 async def on_scan(
         qrcode: str,
