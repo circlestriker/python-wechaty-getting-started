@@ -69,11 +69,50 @@ async def on_message(msg: Message):
             await msg.say('失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg')
             
     elif '抑郁' in msg.text():
-        await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
+        keyword = '抑郁'
+        keyDic = conversationDict.get(conversation_id)
+        if keyDic is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            keyDic = {}
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
+        elif keyDic.get(keyword) is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            print('keyDic:',keyDic.__dict__)
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw')
     elif '学佛' in msg.text():
-        await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
+        keyword = '学佛'
+        keyDic = conversationDict.get(conversation_id)
+        if keyDic is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            keyDic = {}
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
+        elif keyDic.get(keyword) is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            print('keyDic:',keyDic.__dict__)
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg')
     elif '焦虑' in msg.text():
-        await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
+        keyword = '焦虑'
+        keyDic = conversationDict.get(conversation_id)
+        if keyDic is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            keyDic = {}
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
+        elif keyDic.get(keyword) is None:
+            print('该会话第一次回复|%s|' %(keyword))
+            print('keyDic:',keyDic.__dict__)
+            keyDic[keyword] = 1
+            conversationDict[conversation_id] = keyDic
+            await msg.say('焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA')
 
 async def on_scan(
         qrcode: str,
