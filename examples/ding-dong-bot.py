@@ -29,7 +29,35 @@ from wechaty import (
 )
 
 conversationDict = {}
+keyword2reply = {
+    '防守':'防守型球星多的好处:https://mp.weixin.qq.com/s/s_Qfap5motEBSm-auc2v9g',
+    '膝盖伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
+    '脚踝伤':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
+    '崴脚':'盘腿治膝伤:https://mp.weixin.qq.com/s/6OvreXJz3UFwuTPqb-2Lug',
+    '后卫':'众人之所恶的边后卫:https://mp.weixin.qq.com/s/qEj9wNuSLP-uwhGJxNn_pA',
+    '半月板':'鼓楼医院关节科不错:https://mp.weixin.qq.com/s/JH234VpbQmW23NcBduZbJA'
+    }
 
+def replyOnKeyword(conversation_id: str, msg: Message):
+    for keyword in keyword2reply:
+        if (keyword in msg.text()):
+            reply = keyword2reply.get(keyword)
+            print('找到keyword: %s | $s' %(keyword, reply))
+            keyDic = conversationDict.get(conversation_id)
+            if keyDic is None:
+                print('该会话之前未回复')
+                keyDic = {}
+                keyDic[keyword] = 1
+                conversationDict[conversation_id] = keyDic
+                await msg.say(reply)
+            elif keyDic.get(keyword) is None:
+                print('该会话第一次回复keyword: %s' %(keyword))
+                print('keyDic:',keyDic.__dict__)
+                keyDic[keyword] = 1
+                conversationDict[conversation_id] = keyDic
+                await msg.say(reply)
+
+    
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
