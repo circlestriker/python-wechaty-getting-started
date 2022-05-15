@@ -132,3 +132,7 @@ token.txt
 logs/
 **/logs/
 **/log.txt
+
+GPATH
+GRTAGS
+GTAGS
