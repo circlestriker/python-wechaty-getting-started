@@ -37,26 +37,16 @@ keyword2reply = {
     '腾讯':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
     #文化
     '佛祖':'佛陀的悲泣: 谁最希望没有宗教崇拜?: https://mp.weixin.qq.com/s/bcXmgClhHpasxVGPNPdNOQ',
-
     '职称':'高级职称和三甲:https://mp.weixin.qq.com/s/Cf1FO7L9UH_Gllgb9Wt-8Q',
-
     '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
-
     '张国荣':'张国荣遇见宝玉能不能逆天改命:https://mp.weixin.qq.com/s/w5vzBJDMSdU2oJp5hZpoIA',
-
     '尤三姐':'红楼梦最俊美的女子为何要吃斋?: https://mp.weixin.qq.com/s/GrzkWiLmHuIutIshT4evWA',
     '吃素':'红楼梦最俊美的女子为何要吃斋?: https://mp.weixin.qq.com/s/GrzkWiLmHuIutIshT4evWA',
-
     '佛陀':'马克思和佛陀:https://mp.weixin.qq.com/s/OWhQL3i3bqYf9cHiqD0cYA',
-
     '中山大学':'中山大学的风水:https://mp.weixin.qq.com/s/dwxl_7LuzjX_VuAuBzoQnQ',
-
     '段誉':'段誉的舍和慕容复的求:https://mp.weixin.qq.com/s/3NF4RhvCFs9PIWpQmAKC2A',
-
     '离婚':'离婚大魔王和甩手掌柜:https://mp.weixin.qq.com/s/gA7sGgFzb01jcHrFrcEEyg',
-
     '妙玉':'妙玉不妙在哪里？:https://mp.weixin.qq.com/s/dcj_crsMdSOVn8KuQvmQxQ',
-    
     '恋爱':'神仙姐姐恋爱之离苦得乐:https://mp.weixin.qq.com/s/PMAxqZ6ElwSMnHtMyilDUg',
     '神仙姐姐':'神仙姐姐恋爱之离苦得乐:https://mp.weixin.qq.com/s/PMAxqZ6ElwSMnHtMyilDUg',
     '孔子':'孔子的遗憾-人生不够苦:https://mp.weixin.qq.com/s/ZdFeyqHdisdlArz1p6D6CQ',
@@ -166,15 +156,16 @@ async def on_message(msg: Message):
                 keyDic[keyword] = 1
                 conversationDict[conversation_id] = keyDic
                 await msg.say(reply)
+                break #一个群一次只回复一个匹配
             elif keyDic.get(keyword) is None:
                 #print('keyDic:',keyDic.__dict__)
                 print('该会话第一次回复keyword: %s' %(keyword))
                 keyDic[keyword] = 1
                 conversationDict[conversation_id] = keyDic
                 await msg.say(reply)
+                break #一个群一次只回复一个匹配
                 
-            break #一个群一次只回复一个匹配
-
+            
 async def on_scan(
         qrcode: str,
         status: ScanStatus,
