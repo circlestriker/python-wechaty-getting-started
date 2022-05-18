@@ -36,20 +36,10 @@ keyword2reply = {
     '观察者模式':'C++实现观察者模式:https://mp.weixin.qq.com/s/fQ3BFGoiTvb4mKQueb7hWQ',
     '腾讯加班':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
     #文化
-    达摩 达摩九年面壁助力科研和阿里达摩院的命名
-https://mp.weixin.qq.com/s/XpfwRBT3-GsD_SCtD80E-g
-
-    踢法:不累的踢法
-    https://mp.weixin.qq.com/s/QUt0t7k0ZeJOL6VF8y8_vQ
-
-    刘备: 刘备超越了刘邦
-https://mp.weixin.qq.com/s/tw3s4AbtivBS1KYEFDxlRg
-
-    菩萨
-    母亲节之父母犹如子女的菩萨
-https://mp.weixin.qq.com/s/v-dE_X2SQMVnZVNy0fVA0g
-
-    
+    '达摩':'达摩九年面壁助力科研:https://mp.weixin.qq.com/s/XpfwRBT3-GsD_SCtD80E-g',
+    '踢法':'不累的踢法:https://mp.weixin.qq.com/s/QUt0t7k0ZeJOL6VF8y8_vQ',
+    '刘备':'刘备超越了刘邦:https://mp.weixin.qq.com/s/tw3s4AbtivBS1KYEFDxlRg',
+    '菩萨':'母亲节之父母犹如子女的菩萨:https://mp.weixin.qq.com/s/v-dE_X2SQMVnZVNy0fVA0g',
     '佛祖':'佛陀的悲泣: 谁最希望没有宗教崇拜?: https://mp.weixin.qq.com/s/bcXmgClhHpasxVGPNPdNOQ',
     '阿弥陀佛':'佛陀的悲泣: 谁最希望没有宗教崇拜?: https://mp.weixin.qq.com/s/bcXmgClhHpasxVGPNPdNOQ',
     '职称':'高级职称和三甲:https://mp.weixin.qq.com/s/Cf1FO7L9UH_Gllgb9Wt-8Q',
