@@ -35,7 +35,12 @@ keyword2reply = {
     #编程
     '观察者模式':'C++实现观察者模式:https://mp.weixin.qq.com/s/fQ3BFGoiTvb4mKQueb7hWQ',
     '腾讯加班':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
+
+    狮岩:初一游狮岩之“保平安”书:https://mp.weixin.qq.com/s/_2ARdiHwCRcmPaoizHTYxw
+
     #文化
+    '武平一中':'静以修身，俭以养德-纪念母校武平一中老师:https://mp.weixin.qq.com/s/DTZCtVGlkvfLuEAAvj5JdQ',
+    '静以修身':'静以修身，俭以养德-纪念母校武平一中老师:https://mp.weixin.qq.com/s/DTZCtVGlkvfLuEAAvj5JdQ',
     '达摩':'达摩九年面壁助力科研:https://mp.weixin.qq.com/s/XpfwRBT3-GsD_SCtD80E-g',
     '踢法':'不累的踢法:https://mp.weixin.qq.com/s/QUt0t7k0ZeJOL6VF8y8_vQ',
     '刘备':'刘备超越了刘邦:https://mp.weixin.qq.com/s/tw3s4AbtivBS1KYEFDxlRg',
@@ -79,12 +84,15 @@ keyword2reply = {
     '黛玉':'黛玉的美是怎样的？:https://mp.weixin.qq.com/s/otEsaw2YZk1QKKrO2PeCjg',
     '凤姐':'红楼梦算命之凤姐:https://mp.weixin.qq.com/s/0yYnnSxPv_-cYycp26zRZg',
     '妙玉':'妙玉不妙在哪里？:https://mp.weixin.qq.com/s/dcj_crsMdSOVn8KuQvmQxQ',
+    '恋爱':'林黛玉贾宝玉的美好感情:https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
+    '拍拖':'林黛玉贾宝玉的美好感情:https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
     #焦虑#
     '绝望':'以毒攻毒:绝望中寻找希望:https://mp.weixin.qq.com/s/WlSeqHjVj4id6odDWGQeXQ',
     '父母吵架':'慕容复骂老爹:https://mp.weixin.qq.com/s/0XlKT4lsIpVvHGyACZHkvQ',
     '慕容复':'宝玉和慕容复为什么都魔怔?:https://mp.weixin.qq.com/s/A4glTxB6omaBddUFcD4eFg',
     '玄奘':'唐太宗心理咨询玄奘:https://mp.weixin.qq.com/s/XtplxMxYVlaSFKE6Qbw3Nw',
-    '桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
+    #'桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
+    '神医':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
     '加班太多':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg',
     '抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     # '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
