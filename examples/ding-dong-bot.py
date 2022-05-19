@@ -35,9 +35,7 @@ keyword2reply = {
     #编程
     '观察者模式':'C++实现观察者模式:https://mp.weixin.qq.com/s/fQ3BFGoiTvb4mKQueb7hWQ',
     '腾讯加班':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
-
-    狮岩:初一游狮岩之“保平安”书:https://mp.weixin.qq.com/s/_2ARdiHwCRcmPaoizHTYxw
-
+    '狮岩':'初一游狮岩之保平安书:https://mp.weixin.qq.com/s/_2ARdiHwCRcmPaoizHTYxw',
     #文化
     '武平一中':'静以修身，俭以养德-纪念母校武平一中老师:https://mp.weixin.qq.com/s/DTZCtVGlkvfLuEAAvj5JdQ',
     '静以修身':'静以修身，俭以养德-纪念母校武平一中老师:https://mp.weixin.qq.com/s/DTZCtVGlkvfLuEAAvj5JdQ',
