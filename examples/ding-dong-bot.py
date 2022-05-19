@@ -32,6 +32,21 @@ from wechaty import (
 
 conversationDict = {}
 keyword2reply = {
+    #悟空援助
+    '孔子':'救人难-大舅和佛祖、孔子打牌:https://mp.weixin.qq.com/s/BKc16fKFWZ8Qk5MObJDzRg',
+    '蚊子':'蚊子不咬谁:https://mp.weixin.qq.com/s/iMP-MJr4SYSw6nCMb09xsw',
+    '鬼神':'初九祭祖-何为鬼神:https://mp.weixin.qq.com/s/NDRrjhqYL37TZQj0XodqxA',
+    '祭祖':'初九祭祖-何为鬼神:https://mp.weixin.qq.com/s/NDRrjhqYL37TZQj0XodqxA',
+    '创业':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
+    '出家人':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
+    '考研':'执着考研和家庭冲突(上):https://mp.weixin.qq.com/s/6GBQkqS-hyEM1NNWawVpwg',
+    '家庭冲突':'执着考研和家庭冲突(上):https://mp.weixin.qq.com/s/6GBQkqS-hyEM1NNWawVpwg',
+    '状态不好':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
+    '爱情':'老家的爱情故事https://mp.weixin.qq.com/s/FMG_M15ncgo-xe6mc58GHA',
+    '坑爹':'有人救爹，有人坑爹:https://mp.weixin.qq.com/s/Kd7d7Kd-ANaNHs6eSLvOMQ',
+    '仗义':'仗义每从屠狗辈:https://mp.weixin.qq.com/s/NbHWlEOqro6h6gGD8bVLqg',
+    '狭义':'如何发掘宝宝的侠义精神:https://mp.weixin.qq.com/s/LjIugX_FrDv65pyVPTRb2Q',
+    '马云':'马云和阿里到底懂不懂金庸侠义精神？https://mp.weixin.qq.com/s/pW_7jnz98Nqrl1nBj08LrQ',
     #编程
     '观察者模式':'C++实现观察者模式:https://mp.weixin.qq.com/s/fQ3BFGoiTvb4mKQueb7hWQ',
     '腾讯加班':'囧该复活吗-从应届生反映腾讯加班说起:https://mp.weixin.qq.com/s/-26Dbt-ydxJdbWRyxy8LJw',
@@ -46,7 +61,6 @@ keyword2reply = {
     '佛祖':'佛陀的悲泣: 谁最希望没有宗教崇拜?: https://mp.weixin.qq.com/s/bcXmgClhHpasxVGPNPdNOQ',
     '阿弥陀佛':'佛陀的悲泣: 谁最希望没有宗教崇拜?: https://mp.weixin.qq.com/s/bcXmgClhHpasxVGPNPdNOQ',
     '职称':'高级职称和三甲:https://mp.weixin.qq.com/s/Cf1FO7L9UH_Gllgb9Wt-8Q',
-    '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
     '佛陀':'马克思和佛陀:https://mp.weixin.qq.com/s/OWhQL3i3bqYf9cHiqD0cYA',
     '中山大学':'中山大学的风水:https://mp.weixin.qq.com/s/dwxl_7LuzjX_VuAuBzoQnQ',
     '离婚':'离婚大魔王和甩手掌柜:https://mp.weixin.qq.com/s/gA7sGgFzb01jcHrFrcEEyg',
@@ -74,6 +88,10 @@ keyword2reply = {
     '恋爱':'神仙姐姐恋爱之离苦得乐:https://mp.weixin.qq.com/s/PMAxqZ6ElwSMnHtMyilDUg',
     '神仙姐姐':'神仙姐姐恋爱之离苦得乐:https://mp.weixin.qq.com/s/PMAxqZ6ElwSMnHtMyilDUg',
     #红楼梦
+    '布施':'悟空图书馆之红楼梦-细公公布施和宝玉化缘:https://mp.weixin.qq.com/s/JvPVqZ3Bh8zShnVik8chkw',
+    '啦啦队':'林黛玉尤三姐的牺牲和啦啦队鼻祖:https://mp.weixin.qq.com/s/YsiPcEgeaadlsJHSIaImMg',
+    '李德胜':'悟空图书馆之红楼梦-警幻仙子是李德胜的引路人? https://mp.weixin.qq.com/s/zsRiSxP_8ntDHaWZWBUHJQ',
+    '警幻仙子':'悟空图书馆之红楼梦-警幻仙子是李德胜的引路人? https://mp.weixin.qq.com/s/zsRiSxP_8ntDHaWZWBUHJQ',
     '张国荣':'张国荣遇见宝玉能不能逆天改命:https://mp.weixin.qq.com/s/w5vzBJDMSdU2oJp5hZpoIA',
     '尤三姐':'红楼梦最俊美的女子为何要吃斋?: https://mp.weixin.qq.com/s/GrzkWiLmHuIutIshT4evWA',
     '吃素':'红楼梦最俊美的女子为何要吃斋?: https://mp.weixin.qq.com/s/GrzkWiLmHuIutIshT4evWA',
@@ -95,6 +113,7 @@ keyword2reply = {
     '抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     # '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
     '抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
+    '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
     # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
     # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
     '焦虑':'供参考-不放弃，就有康复的希望:https://mp.weixin.qq.com/s/O2nb-450640ankJqKkjsDA',
