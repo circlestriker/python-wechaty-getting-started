@@ -142,28 +142,6 @@ keyword2reply = {
     '半月板':'鼓楼医院关节科不错:https://mp.weixin.qq.com/s/JH234VpbQmW23NcBduZbJA'
     }
 
-# async def replyOnKeyword(conversation_id: str, msg: Message):
-#     for keyword in keyword2reply:
-#         if (keyword in msg.text()):
-#             reply = keyword2reply.get(keyword)
-#             print('找到keyword: %s | %s' %(keyword, reply))
-#             keyDic = conversationDict.get(conversation_id)
-#             if keyDic is None:
-#                 print('该会话之前未回复')
-#                 keyDic = {}
-#                 keyDic[keyword] = 1
-#                 conversationDict[conversation_id] = keyDic
-#                 await msg.say(reply)
-#             elif keyDic.get(keyword) is None:
-#                 print('keyDic:',keyDic.__dict__)
-#                 print('该会话第一次回复keyword: %s' %(keyword))
-#                 keyDic[keyword] = 1
-#                 conversationDict[conversation_id] = keyDic
-#                 await msg.say(reply)
-                
-#             break #一个群一次只回复一个匹配
-
-    
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
