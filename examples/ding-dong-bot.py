@@ -152,6 +152,11 @@ async def on_message(msg: Message):
     conversation_id = ''
     if room is not None:
         conversation_id = room.room_id #str
+        room_name = await room.topic()
+        print(f"群聊名: {room_name}")
+        if "研究院核心团队" in room_name or "江苏鸿程大数据研究院" in room_name:
+            print(f"鸿程, return")
+            return
     else:
         talker = None
         if msg.is_self():
