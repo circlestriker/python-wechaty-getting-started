@@ -183,8 +183,9 @@ async def on_message(msg: Message):
                 keyDic[keyword] = 1
                 conversationDict[conversation_id] = keyDic
                 await msg.say(reply)
-                if(keyword === '滨江花园'):
-                    imgFile = FileBox.fromLocal('/home/dev/py/wangning.jpeg')
+                if(keyword == '滨江花园'):
+                    #imgFile = FileBox.fromLocal('/home/dev/py/wangning.jpeg')
+                    imgFile = FileBox.from_file('/home/dev/py/wangning.jpeg')
                     await msg.say(imgFile)
 
                 break #一个群一次只回复一个匹配
