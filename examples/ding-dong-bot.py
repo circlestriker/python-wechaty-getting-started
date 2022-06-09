@@ -34,6 +34,17 @@ conversationDict = {}
 keyword2reply = {
     '滨江花园':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
     '婚宴酒店':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
+    '段永平':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
+    '投资理念':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
+    '睡不好':'建文帝常遇春10-运动治疗失眠:https://mp.weixin.qq.com/s/hBGViksSWDIFNOqxSju6mg',
+    '医生':'医人和医电脑的异同:https://mp.weixin.qq.com/s/N_mv53U5lV7HxGwLeeUiQA',
+    '凤凰涅槃':'湘江血战之凤凰涅槃: https://mp.weixin.qq.com/s/eIfjWgIPx0GHnk9UYbmzlw',
+    '湘江':'湘江血战之凤凰涅槃: https://mp.weixin.qq.com/s/eIfjWgIPx0GHnk9UYbmzlw',
+    '情为何物':'问世间情(钱)为何物? https://mp.weixin.qq.com/s/BawHmnXKdlQmRox-Jf-FJg',
+    '网瘾':'乔峰援助7-网瘾少女沉迷抖音(上):https://mp.weixin.qq.com/s/Jhev3vesiO2ZU1DGSF6tMw',
+    '沉迷':'乔峰援助7-网瘾少女沉迷抖音(上):https://mp.weixin.qq.com/s/Jhev3vesiO2ZU1DGSF6tMw',
+    '本泽马':'都怪佛陀, 都怪本泽马: https://mp.weixin.qq.com/s/zY-RZnaoRkUNt0SSoE4Oww',
+    
     #悟空援助
     '孔子':'救人难-大舅和佛祖、孔子打牌:https://mp.weixin.qq.com/s/BKc16fKFWZ8Qk5MObJDzRg',
     '蚊子':'蚊子不咬谁:https://mp.weixin.qq.com/s/iMP-MJr4SYSw6nCMb09xsw',
@@ -116,6 +127,7 @@ keyword2reply = {
     '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
     '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
     '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
+    '抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
     # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
     #'抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
     # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
