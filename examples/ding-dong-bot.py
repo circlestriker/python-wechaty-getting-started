@@ -210,8 +210,8 @@ async def on_message(msg: Message):
     if room is not None:
         conversation_id = room.room_id #str
         room_name = await room.topic()
-        talker = msg.talker()
-        if "郁金香" in talker.name() or "润鑫" in talker.name():
+        talker: Contact = msg.talker()
+        if "郁金香" in talker.name or "润鑫" in talker.name:
             print(f"发消息的是郁金香, 直接return")
             return
         
