@@ -16,6 +16,7 @@ limitations under the License.
 import os
 import asyncio
 import time
+import pymysql
 
 #import logging
 
@@ -44,13 +45,48 @@ keyword2reply = {
     '网瘾':'乔峰援助7-网瘾少女沉迷抖音(上):https://mp.weixin.qq.com/s/Jhev3vesiO2ZU1DGSF6tMw',
     '沉迷':'乔峰援助7-网瘾少女沉迷抖音(上):https://mp.weixin.qq.com/s/Jhev3vesiO2ZU1DGSF6tMw',
     '本泽马':'都怪佛陀, 都怪本泽马: https://mp.weixin.qq.com/s/zY-RZnaoRkUNt0SSoE4Oww',
+
+    '救人':'救人难-大舅和佛祖、孔子打牌 https://mp.weixin.qq.com/s/BKc16fKFWZ8Qk5MObJDzRg',
+    '阎王':'阎王见乔峰https://mp.weixin.qq.com/s/vZaMIXcVYCfoY9OwQ_dCPA',
+    '恋爱':'悟空图书馆-林黛玉贾宝玉的美好感情https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
+    '公益图书馆':'公益悟空图书馆-老家可以更团结点https://mp.weixin.qq.com/s/JuBVLMuR2I7Fjc_pjTloXw',
+    '乔峰':'乔峰的原型是谁:https://mp.weixin.qq.com/s/Pvip07l6tPRftJo3JS7XkQ',
+    '总统':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
+    '扫大街':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
+    '地狱':'地狱是天堂的必由之路-悟空图书馆<<金刚经>> https://mp.weixin.qq.com/s/QYByIooVzZEfbSrm4brPSw',
+    '佛祖':'宝宝是怎么把爸妈逼成佛祖的? https://mp.weixin.qq.com/s/J-mk7H71G_10kYP-qlyMKA',
+    '性格':'悟空图书馆-性格决定命运? https://mp.weixin.qq.com/s/bQS7B_9wFSFg-LlrAq-j1w',
+    '心经':'谁能狂过观音? 观音是谁? https://mp.weixin.qq.com/s/E49FA0e1rOBQv-iQ1H_9IA',
+    '观音':'谁能狂过观音? 观音是谁? https://mp.weixin.qq.com/s/E49FA0e1rOBQv-iQ1H_9IA',
+    '霍去病':'舍生忘死的霍去病-匈奴未灭何以家为:https://mp.weixin.qq.com/s/Mgpjxi_l87S2r0_hWumomw',
+    '双相':'佛祖99%是因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    '躁狂':'仁心济世, 度一切苦厄--向世界级难题宣战:https://mp.weixin.qq.com/s/IEOMHOFeWSTE9J8C6Fjsaw',
+    '足球场':'绿茵兄弟情-我们的青春:https://mp.weixin.qq.com/s/805glGFtJpDJiig4YmNPIQ',
+    '英雄':'那些舍己为人的英雄们:https://mp.weixin.qq.com/s/K7aPrJIl07nvVUJ8BaFuzQ',
+    '武则天':'武则天的好色和她的<<金刚经>>开经偈:https://mp.weixin.qq.com/s/sHobaBPxpkI5vqXV_cUnmw',
+    '安贫乐道':'安贫乐道：人生信仰的至高境界:https://mp.weixin.qq.com/s/A06F1obGVsnZYH7tegyFTw',
+    '夜王':'"夜王"对决"地藏王":https://mp.weixin.qq.com/s/pIlNEKVt5vx3rQjloOiolg',
+    '地藏王':'"夜王"对决"地藏王":https://mp.weixin.qq.com/s/pIlNEKVt5vx3rQjloOiolg',
+    '色即是空':'公益“悟空图书馆”—天龙八部“王霸雄图，色即是空”:https://mp.weixin.qq.com/s/e7OY4M7CpPewkrpfMSD7iA',
+    '天龙八部':'天龙八部之为什么大苦大卑之人达最高境界:https://mp.weixin.qq.com/s/zfdrjUXpqjbW26WLSTIfPw',
+    '西域':'公益“悟空图书馆”—好书之<<大唐西域记>>:https://mp.weixin.qq.com/s/yANO3CwmiyYyq7XEYjXoBw',
+    '段正淳':'中大出了个"段正淳"? https://mp.weixin.qq.com/s/BfuLESVNvoHoY2tgV0CjYA',
+    '怕鬼':'不少人经历过怕鬼，多少人希望遇见鬼? https://mp.weixin.qq.com/s/i4A3JsRNg61xgCtFghpjpw',
+    '姜大卫':'一手三把刀:https://mp.weixin.qq.com/s/rGTy8LHJ0ANjJr3nmsXO_Q',
+    '西游记':'西游记里的无字真经也是真经:https://mp.weixin.qq.com/s/7Toz-NdW_pTBQrbeINQVWg',
+    '大悲咒':'大悲咒的殊胜以及和国歌的异曲同工:https://mp.weixin.qq.com/s/3hiCu9px42oVq7eds6HimQ',
+
+#这辈子, 我的大学https://mp.weixin.qq.com/s/lvSCrG6V4Z9fWGAVFp-q9g
+
+    '刘邦':'刘邦之不怕死和"知人者智，自知者明"https://mp.weixin.qq.com/s/vuSqhez6G2eASr7N8J3qlA',
     
     #悟空援助
     '孔子':'救人难-大舅和佛祖、孔子打牌:https://mp.weixin.qq.com/s/BKc16fKFWZ8Qk5MObJDzRg',
     '蚊子':'蚊子不咬谁:https://mp.weixin.qq.com/s/iMP-MJr4SYSw6nCMb09xsw',
     '鬼神':'初九祭祖-何为鬼神:https://mp.weixin.qq.com/s/NDRrjhqYL37TZQj0XodqxA',
     '祭祖':'初九祭祖-何为鬼神:https://mp.weixin.qq.com/s/NDRrjhqYL37TZQj0XodqxA',
-    '创业':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
+    '剃光头':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
+    '创业难':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
     '出家人':'创业和出家人为什么要剃光头:https://mp.weixin.qq.com/s/_anmJ2qAvJE5zdhRZHDgsQ',
     '考研':'执着考研和家庭冲突(上):https://mp.weixin.qq.com/s/6GBQkqS-hyEM1NNWawVpwg',
     '家庭冲突':'执着考研和家庭冲突(上):https://mp.weixin.qq.com/s/6GBQkqS-hyEM1NNWawVpwg',
@@ -78,7 +114,7 @@ keyword2reply = {
     '中山大学':'中山大学的风水:https://mp.weixin.qq.com/s/dwxl_7LuzjX_VuAuBzoQnQ',
     '离婚':'离婚大魔王和甩手掌柜:https://mp.weixin.qq.com/s/gA7sGgFzb01jcHrFrcEEyg',
     '孔子':'孔子的遗憾-人生不够苦:https://mp.weixin.qq.com/s/ZdFeyqHdisdlArz1p6D6CQ',
-    '公益图书馆':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
+    '无畏':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
     '布施':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
     '新冠':'[悟空图书馆]-新冠如长夜:https://mp.weixin.qq.com/s/hvtpV04KHq25sXvWO7pJXA',
     '观世音':'比特币和观世音:https://mp.weixin.qq.com/s/dAjozxD7B90BpY7WLmnasg',
@@ -157,6 +193,12 @@ keyword2reply = {
     '半月板':'鼓楼医院关节科不错:https://mp.weixin.qq.com/s/JH234VpbQmW23NcBduZbJA'
     }
 
+#连接数据库
+#conn = pymysql.connect(host="127.0.0.1", user="root", passwd="Qlcx1997", db='keys', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
+#创建游标
+#cursor = conn.cursor()
+
+
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
@@ -168,10 +210,15 @@ async def on_message(msg: Message):
     if room is not None:
         conversation_id = room.room_id #str
         room_name = await room.topic()
-        print(f"群聊名: {room_name}")
-        if "研究院核心团队" in room_name or "江苏鸿程大数据研究院" in room_name:
-            print(f"鸿程, return")
+        talker = msg.talker()
+        if "郁金香" in talker.name() or "润鑫" in talker.name():
+            print(f"发消息的是郁金香, 直接return")
             return
+        
+        # print(f"群聊名: {room_name}")
+        # if "研究院核心团队" in room_name or "江苏鸿程大数据研究院" in room_name:
+        #     print(f"鸿程, return")
+        #     return
     else:
         talker = None
         if msg.is_self():
