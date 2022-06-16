@@ -49,7 +49,7 @@ keyword2reply = {
     '救人':'救人难-大舅和佛祖、孔子打牌 https://mp.weixin.qq.com/s/BKc16fKFWZ8Qk5MObJDzRg',
     '阎王':'阎王见乔峰https://mp.weixin.qq.com/s/vZaMIXcVYCfoY9OwQ_dCPA',
     '恋爱':'悟空图书馆-林黛玉贾宝玉的美好感情https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
-    '公益图书馆':'公益悟空图书馆-老家可以更团结点https://mp.weixin.qq.com/s/JuBVLMuR2I7Fjc_pjTloXw',
+    '老家公益':'公益悟空图书馆-老家可以更团结点https://mp.weixin.qq.com/s/JuBVLMuR2I7Fjc_pjTloXw',
     '乔峰':'乔峰的原型是谁:https://mp.weixin.qq.com/s/Pvip07l6tPRftJo3JS7XkQ',
     '总统':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
     '扫大街':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
@@ -61,7 +61,7 @@ keyword2reply = {
     '霍去病':'舍生忘死的霍去病-匈奴未灭何以家为:https://mp.weixin.qq.com/s/Mgpjxi_l87S2r0_hWumomw',
     '双相':'佛祖99%是因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     '躁狂':'仁心济世, 度一切苦厄--向世界级难题宣战:https://mp.weixin.qq.com/s/IEOMHOFeWSTE9J8C6Fjsaw',
-    '足球场':'绿茵兄弟情-我们的青春:https://mp.weixin.qq.com/s/805glGFtJpDJiig4YmNPIQ',
+    '绿茵':'绿茵兄弟情-我们的青春:https://mp.weixin.qq.com/s/805glGFtJpDJiig4YmNPIQ',
     '英雄':'那些舍己为人的英雄们:https://mp.weixin.qq.com/s/K7aPrJIl07nvVUJ8BaFuzQ',
     '武则天':'武则天的好色和她的<<金刚经>>开经偈:https://mp.weixin.qq.com/s/sHobaBPxpkI5vqXV_cUnmw',
     '安贫乐道':'安贫乐道：人生信仰的至高境界:https://mp.weixin.qq.com/s/A06F1obGVsnZYH7tegyFTw',
@@ -116,7 +116,7 @@ keyword2reply = {
     '孔子':'孔子的遗憾-人生不够苦:https://mp.weixin.qq.com/s/ZdFeyqHdisdlArz1p6D6CQ',
     '无畏':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
     '布施':'公益悟空图书馆-无畏布施:https://mp.weixin.qq.com/s/_xUjz1sWzJ183tqAVOdCAQ',
-    '新冠':'[悟空图书馆]-新冠如长夜:https://mp.weixin.qq.com/s/hvtpV04KHq25sXvWO7pJXA',
+    '长夜':'[悟空图书馆]-新冠如长夜:https://mp.weixin.qq.com/s/hvtpV04KHq25sXvWO7pJXA',
     '观世音':'比特币和观世音:https://mp.weixin.qq.com/s/dAjozxD7B90BpY7WLmnasg',
     '道法自然':'[花魂黛玉]道法自然，把握阴阳:https://mp.weixin.qq.com/s/1xOiudL2S0R2n_Qblo_k5w',
     '顽疾':'传统文化解决多年顽疾:https://mp.weixin.qq.com/s/BfeYHVFCx40ApIkr0wk9Ig',
@@ -216,9 +216,10 @@ async def on_message(msg: Message):
             return
         
         # print(f"群聊名: {room_name}")
-        # if "研究院核心团队" in room_name or "江苏鸿程大数据研究院" in room_name:
-        #     print(f"鸿程, return")
-        #     return
+        if "斑猪" in room_name and "斑猪报名" in msg.text():
+            print(f"斑猪活动报名")
+            await msg.say('报名-羽毛球\n\n周六（6月18日）14-17点\n东英 （已订13号场）3小时\n费用：AA\n手机报名链接:https://wxaurl.cn/nlNigx3MXns')
+            return
     else:
         talker = None
         if msg.is_self():
