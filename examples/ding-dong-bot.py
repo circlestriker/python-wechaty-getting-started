@@ -50,7 +50,7 @@ keyword2reply = {
     '阎王':'阎王见乔峰https://mp.weixin.qq.com/s/vZaMIXcVYCfoY9OwQ_dCPA',
     '恋爱':'悟空图书馆-林黛玉贾宝玉的美好感情https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
     '老家公益':'公益悟空图书馆-老家可以更团结点https://mp.weixin.qq.com/s/JuBVLMuR2I7Fjc_pjTloXw',
-    '乔峰':'乔峰的原型是谁:https://mp.weixin.qq.com/s/Pvip07l6tPRftJo3JS7XkQ',
+    '乔峰原型':'乔峰的原型是谁:https://mp.weixin.qq.com/s/Pvip07l6tPRftJo3JS7XkQ',
     '总统':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
     '扫大街':'扫大街不一定比当总统差 https://mp.weixin.qq.com/s/DDSoOrfDl3N-6f6Mq1HNng',
     '地狱':'地狱是天堂的必由之路-悟空图书馆<<金刚经>> https://mp.weixin.qq.com/s/QYByIooVzZEfbSrm4brPSw',
@@ -61,7 +61,6 @@ keyword2reply = {
     '霍去病':'舍生忘死的霍去病-匈奴未灭何以家为:https://mp.weixin.qq.com/s/Mgpjxi_l87S2r0_hWumomw',
     '双相':'佛祖99%是因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     '躁狂':'仁心济世, 度一切苦厄--向世界级难题宣战:https://mp.weixin.qq.com/s/IEOMHOFeWSTE9J8C6Fjsaw',
-    '绿茵':'绿茵兄弟情-我们的青春:https://mp.weixin.qq.com/s/805glGFtJpDJiig4YmNPIQ',
     '英雄':'那些舍己为人的英雄们:https://mp.weixin.qq.com/s/K7aPrJIl07nvVUJ8BaFuzQ',
     '武则天':'武则天的好色和她的<<金刚经>>开经偈:https://mp.weixin.qq.com/s/sHobaBPxpkI5vqXV_cUnmw',
     '安贫乐道':'安贫乐道：人生信仰的至高境界:https://mp.weixin.qq.com/s/A06F1obGVsnZYH7tegyFTw',
@@ -211,8 +210,8 @@ async def on_message(msg: Message):
         conversation_id = room.room_id #str
         room_name = await room.topic()
         talker: Contact = msg.talker()
-        if "郁金香" in talker.name or "润鑫" in talker.name:
-            print(f"发消息的是郁金香, 直接return")
+        if "郁金香" in talker.name or "润鑫" in talker.name or "寒啸" in talker.name:
+            print(f"发消息的是郁金香等, 直接return")
             return
         
         # print(f"群聊名: {room_name}")
