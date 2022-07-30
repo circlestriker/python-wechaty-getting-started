@@ -22,6 +22,7 @@ import pymysql
 
 from urllib.parse import quote
 
+from wechaty_puppet import MessageType
 from wechaty import (
     Contact,
     FileBox,
@@ -197,6 +198,7 @@ keyword2reply = {
 #创建游标
 #cursor = conn.cursor()
 
+miniProgramDict = {'loaded':None}
 
 async def on_message(msg: Message):
     """
@@ -234,6 +236,20 @@ async def on_message(msg: Message):
     更多内容点击下方链接👇👇👇
 
     （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
+
+            
+            if miniProgramDict.get('loaded') is not None:
+                await msg.say(miniProgramDict.get('loaded'))
+            if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
+                mini_program = await msg.to_mini_program()
+
+                # save the mini-program data as string
+                mini_program_data = asdict(mini_program.payload)
+
+                # load the min-program
+                miniProgramDict['loaded'] = self.MiniProgram.create_from_json(
+                    payload_data=mini_program_data
+                )
             return
     else:
         talker = None
