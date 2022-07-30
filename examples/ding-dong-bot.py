@@ -33,8 +33,8 @@ from wechaty import (
 
 conversationDict = {}
 keyword2reply = {
-    '滨江花园':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
-    '婚宴酒店':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
+    #'滨江花园':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
+    #'婚宴酒店':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
     '段永平':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
     '投资理念':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
     '睡不好':'建文帝常遇春10-运动治疗失眠:https://mp.weixin.qq.com/s/hBGViksSWDIFNOqxSju6mg',
@@ -215,9 +215,25 @@ async def on_message(msg: Message):
             return
         
         # print(f"群聊名: {room_name}")
-        if "斑猪" in room_name and "斑猪报名" in msg.text():
+        if "斑猪" in room_name and "#活动" in msg.text():
             print(f"斑猪活动报名")
-            await msg.say('报名-羽毛球\n\n周六（6月18日）14-17点\n东英 （已订13号场）3小时\n费用：AA\n手机报名链接:https://wxaurl.cn/nlNigx3MXns')
+            await msg.say('''【得闲打球】
+    ⏱07/20 周三 | 13:29 至 08/21 周四 | 13:29
+    📍杨协成时尚工场A座协爽(海珠区赤岗西路)
+    📍广东省广州市海珠区江贝安定里
+    💰报名后付费
+
+    【报名 1/不限】
+    1、弯腰捡球爱好者 🌹
+    2、
+    3、
+
+    ❗报名截止时间：2022-8-20 13:29:00
+
+
+    更多内容点击下方链接👇👇👇
+
+    （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
             return
     else:
         talker = None
