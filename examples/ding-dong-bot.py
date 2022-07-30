@@ -258,7 +258,7 @@ async def on_message(msg: Message):
             
             if miniProgramDict.get('loaded') is not None:
                 print('mini:', miniProgramDict.get('loaded').__dict__)
-                await msg.say(miniProgramDict.get('loaded'))
+                await room.say(miniProgramDict.get('loaded'))
             return
     else:
         talker = None
