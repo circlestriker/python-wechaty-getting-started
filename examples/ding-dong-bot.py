@@ -17,17 +17,20 @@ import os
 import asyncio
 import time
 import pymysql
+from typing import Optional
 
 #import logging
 
 from urllib.parse import quote
 
+from dataclasses import asdict
 from wechaty_puppet import MessageType
 from wechaty import (
     Contact,
     FileBox,
     Message,
     Wechaty,
+    MiniProgram,
     ScanStatus,
     Room,
 )
@@ -200,11 +203,13 @@ keyword2reply = {
 
 miniProgramDict = {'loaded':None}
 
+bot: Optional[Wechaty] = None
+
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
     groupId-keyword-string-cnt
-    """
+   """
     time.sleep(3) #避免太快回复
     room = msg.room()
     conversation_id = ''
@@ -217,6 +222,19 @@ async def on_message(msg: Message):
             return
         
         # print(f"群聊名: {room_name}")
+        if "斑猪" in room_name:
+            if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
+                mini_program = await msg.to_mini_program()
+
+                # save the mini-program data as string
+                mini_program_data = asdict(mini_program.payload)
+                print('str of mini:', mini_program_data)
+
+                # load the min-program
+                miniProgramDict['loaded'] = bot.MiniProgram.create_from_json(
+                    payload_data=mini_program_data
+                )
+
         if "斑猪" in room_name and "#活动" in msg.text():
             print(f"斑猪活动报名")
             await msg.say('''【得闲打球】
@@ -239,17 +257,8 @@ async def on_message(msg: Message):
 
             
             if miniProgramDict.get('loaded') is not None:
+                print('mini:', miniProgramDict.get('loaded').__dict__)
                 await msg.say(miniProgramDict.get('loaded'))
-            if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
-                mini_program = await msg.to_mini_program()
-
-                # save the mini-program data as string
-                mini_program_data = asdict(mini_program.payload)
-
-                # load the min-program
-                miniProgramDict['loaded'] = self.MiniProgram.create_from_json(
-                    payload_data=mini_program_data
-                )
             return
     else:
         talker = None
@@ -333,6 +342,8 @@ async def main():
             https://github.com/wechaty/python-wechaty-getting-started/#wechaty_puppet_service_token
         ''')
 
+    #bot = Wechaty()
+    global bot
     bot = Wechaty()
 
     bot.on('scan',      on_scan)
