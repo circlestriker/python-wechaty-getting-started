@@ -19,6 +19,10 @@ import time
 import pymysql
 from typing import Optional
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+
+
 #import logging
 
 from urllib.parse import quote
@@ -34,6 +38,7 @@ from wechaty import (
     ScanStatus,
     Room,
 )
+
 
 conversationDict = {}
 keyword2reply = {
@@ -198,9 +203,11 @@ keyword2reply = {
 
 #连接数据库
 #conn = pymysql.connect(host="127.0.0.1", user="root", passwd="Qlcx1997", db='keys', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
+conn = pymysql.connect(host="120.77.62.108", user="hscl", passwd="Huishuchuanglian2022banzhu", db='banzhutest', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
 #创建游标
-#cursor = conn.cursor()
+cursor = conn.cursor()
 
+banzhuRoom = None
 miniProgramDict = {'loaded':None}
 
 bot: Optional[Wechaty] = None
@@ -217,12 +224,12 @@ async def on_message(msg: Message):
         conversation_id = room.room_id #str
         room_name = await room.topic()
         talker: Contact = msg.talker()
-        if "郁金香" in talker.name or "润鑫" in talker.name or "寒啸" in talker.name:
+        if "郁金香" in talker.name or "润鑫" in talker.name or "寒啸" in talker.name or room_name == "7线内部群":
             print(f"发消息的是郁金香等, 直接return")
             return
         
         # print(f"群聊名: {room_name}")
-        if "斑猪" in room_name:
+        if "斑猪产品研发群" in room_name:
             if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
                 mini_program = await msg.to_mini_program()
 
@@ -230,12 +237,21 @@ async def on_message(msg: Message):
                 mini_program_data = asdict(mini_program.payload)
                 print('str of mini:', mini_program_data)
 
+                # 插入db
+                # sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
+                # values (%s, %s, %s, %s)"""
+                # cursor.execute(sql, room.room_id, room_name, mini_program_data, 0)
+                # con.commit()
+
+                if banzhuRoom is None:
+                    banzhuRoom = room
+
                 # load the min-program
                 miniProgramDict['loaded'] = bot.MiniProgram.create_from_json(
                     payload_data=mini_program_data
                 )
 
-        if "斑猪" in room_name and "#活动" in msg.text():
+        if "斑猪产品研发群" in room_name and "#活动" in msg.text():
             print(f"斑猪活动报名")
             await msg.say('''【得闲打球】
     ⏱07/20 周三 | 13:29 至 08/21 周四 | 13:29
@@ -322,6 +338,39 @@ async def main():
     """
     Async Main Entry
     """
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+
+    trigger = CronTrigger(
+        year="*", month="*", day="*", hour="9", minute="0", second="0"
+    )
+    trigger2 = CronTrigger(
+        year="*", month="*", day="*", hour="12", minute="0", second="0"
+    )
+    trigger3 = CronTrigger(
+        year="*", month="*", day="*", hour="18", minute="0", second="0"
+    )
+    scheduler.add_job(
+        foo,
+        trigger=trigger,
+        args=["hello world"],
+        name="9am",
+    )
+    scheduler.add_job(
+        foo,
+        trigger=trigger2,
+        args=["hello world"],
+        name="9am",
+    )
+    scheduler.add_job(
+        foo,
+        trigger=trigger3,
+        args=["hello world"],
+        name="9am",
+    )
+    while True:
+        sleep(5)
+
     #
     # Make sure we have set WECHATY_PUPPET_SERVICE_TOKEN in the environment variables.
     # Learn more about services (and TOKEN) from https://wechaty.js.org/docs/puppet-services/
@@ -341,6 +390,12 @@ async def main():
             You need a TOKEN to run the Python Wechaty. Please goto our README for details
             https://github.com/wechaty/python-wechaty-getting-started/#wechaty_puppet_service_token
         ''')
+
+    # 插入db
+    # sql = """INSERT keywordurl(keyword,url) 
+    #             values (%s, %s)"""
+    # cursor.execute(sql, 0)
+    # con.commit()
 
     #bot = Wechaty()
     global bot
