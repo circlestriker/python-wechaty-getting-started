@@ -22,6 +22,11 @@ from typing import Optional
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from apscheduler.schedulers.blocking import BlockingScheduler
+from datetime import datetime
+
+import schedule
+
 
 #import logging
 
@@ -333,22 +338,39 @@ async def on_login(user: Contact):
     print(user)
     # TODO: To be written
 
+def foo(str):
+    print("Hello World")
 
+def job():
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    
+    
 async def main():
     """
     Async Main Entry
     """
+
+    
+    schedule.every(5).seconds.do(job)
+
+    # 定义BlockingScheduler
+    #sched = BlockingScheduler()
+    # sched = BackgroundScheduler()
+
+    # sched.add_job(job, 'interval', seconds=5)
+    # sched.start()
+
+    """
     scheduler = BackgroundScheduler()
-    scheduler.start()
 
     trigger = CronTrigger(
-        year="*", month="*", day="*", hour="9", minute="0", second="0"
+        year="*", month="*", day="*", hour="*", minute="*", second="20"
     )
     trigger2 = CronTrigger(
-        year="*", month="*", day="*", hour="12", minute="0", second="0"
+        year="*", month="*", day="*", hour="*", minute="*", second="30"
     )
     trigger3 = CronTrigger(
-        year="*", month="*", day="*", hour="18", minute="0", second="0"
+        year="*", month="*", day="*", hour="*", minute="*", second="45"
     )
     scheduler.add_job(
         foo,
@@ -368,8 +390,9 @@ async def main():
         args=["hello world"],
         name="9am",
     )
-    while True:
-        sleep(5)
+
+    scheduler.start()
+    """
 
     #
     # Make sure we have set WECHATY_PUPPET_SERVICE_TOKEN in the environment variables.
@@ -398,14 +421,14 @@ async def main():
     # con.commit()
 
     #bot = Wechaty()
-    global bot
-    bot = Wechaty()
+    # global bot
+    # bot = Wechaty()
 
-    bot.on('scan',      on_scan)
-    bot.on('login',     on_login)
-    bot.on('message',   on_message)
+    # bot.on('scan',      on_scan)
+    # bot.on('login',     on_login)
+    # bot.on('message',   on_message)
 
-    await bot.start()
+    # await bot.start()
 
     print('[Python Wechaty] Ding Dong Bot started.')
 
