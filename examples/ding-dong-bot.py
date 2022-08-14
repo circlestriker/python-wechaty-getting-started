@@ -400,7 +400,7 @@ async def main():
         ''')
 
     #bot = Wechaty()
-    # global bot
+    global bot
     bot = Wechaty()
 
     bot.on('scan',      on_scan)
