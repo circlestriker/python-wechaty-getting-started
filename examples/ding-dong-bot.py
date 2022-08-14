@@ -26,6 +26,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from datetime import datetime
 
 import schedule
+import MySQLdb
 
 
 #import logging
@@ -47,7 +48,6 @@ from wechaty import (
 
 conversationDict = {}
 keyword2reply = {
-    #'滨江花园':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
     #'婚宴酒店':'欢迎预订滨江花园婚宴酒店: https://mp.weixin.qq.com/s/A0FTDhL69znSE7tAsPu4wQ',
     '段永平':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
     '投资理念':'段永平投资理念摘要: https://mp.weixin.qq.com/s/72920b6lPy_vK3VFxD6Hfw',
@@ -243,10 +243,10 @@ async def on_message(msg: Message):
                 print('str of mini:', mini_program_data)
 
                 # 插入db
-                # sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
-                # values (%s, %s, %s, %s)"""
-                # cursor.execute(sql, room.room_id, room_name, mini_program_data, 0)
-                # con.commit()
+                sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
+                values (%s, %s, %s, %s)"""
+                cursor.execute(sql, room.room_id, room_name, mini_program_data, 0)
+                con.commit()
 
                 if banzhuRoom is None:
                     banzhuRoom = room
@@ -277,6 +277,12 @@ async def on_message(msg: Message):
     （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
 
             
+            selectSql = """select from mini_program where group_id = %s
+            """
+            selectData = (1)
+            cursor.execute(selectSql, selectData)
+            con.commit()
+
             if miniProgramDict.get('loaded') is not None:
                 print('mini:', miniProgramDict.get('loaded').__dict__)
                 await room.say(miniProgramDict.get('loaded'))
@@ -344,15 +350,60 @@ def foo(str):
 def job():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
+def work():
+    print("Study and work hard")
     
 async def main():
     """
     Async Main Entry
     """
 
+
+    # 插入db
+    # try:
+    #     sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
+    #           values (%s, %s, %s, %s)"""
+    #     data = (1, 'test', 'ministr', 0)
+    #     cursor.execute(sql, data)
+    #     conn.commit()
+    # except (MySQLdb.Error, MySQLdb.Warning) as e:
+    #     # Rolling back in case of error
+    #     print("db error")
+    #     print(e)
+    #     conn.rollback()
+
+
+    try:
+        selectSql = """select * from mini_program where group_id = %s
+        """
+        selectData = (1)
+        cursor.execute(selectSql, selectData)
+        conn.commit()
+
+        #Fetching 1st row from the table
+        result = cursor.fetchone();
+        print("db select")
+        print(result)
+
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+        # Rolling back in case of error
+        print("db error")
+        print(e)
+        c   
+
+    schedule.every(3).seconds.do(work)
     
     schedule.every(5).seconds.do(job)
+    # Loop so that the scheduling task
+    # keeps on running all time.
+    while True:
 
+        # Checks whether a scheduled task
+        # is pending to run or not
+        schedule.run_pending()
+        time.sleep(1)
+
+    
     # 定义BlockingScheduler
     #sched = BlockingScheduler()
     # sched = BackgroundScheduler()
