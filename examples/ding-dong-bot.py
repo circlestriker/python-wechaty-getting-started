@@ -243,10 +243,17 @@ async def on_message(msg: Message):
                 print('str of mini:', mini_program_data)
 
                 # 插入db
-                sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
-                values (%s, %s, %s, %s)"""
-                cursor.execute(sql, room.room_id, room_name, mini_program_data, 0)
-                con.commit()
+                try:
+                    sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
+                        values (%s, %s, %s, %s)"""
+                    data = (room.room_id, room_name, mini_program_data, 0)
+                    cursor.execute(sql, data)
+                    conn.commit()
+                except (MySQLdb.Error, MySQLdb.Warning) as e:
+                    # Rolling back in case of error
+                    print("db insert error")
+                    print(e)
+                    conn.rollback()
 
                 if banzhuRoom is None:
                     banzhuRoom = room
@@ -276,12 +283,12 @@ async def on_message(msg: Message):
 
     （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
 
-            
-            selectSql = """select from mini_program where group_id = %s
+            #属于这个群的有效的活动 
+            selectSql = """select * from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
             """
             selectData = (1)
             cursor.execute(selectSql, selectData)
-            con.commit()
+            conn.commit()
 
             if miniProgramDict.get('loaded') is not None:
                 print('mini:', miniProgramDict.get('loaded').__dict__)
@@ -359,41 +366,10 @@ async def main():
     """
 
 
-    # 插入db
-    # try:
-    #     sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
-    #           values (%s, %s, %s, %s)"""
-    #     data = (1, 'test', 'ministr', 0)
-    #     cursor.execute(sql, data)
-    #     conn.commit()
-    # except (MySQLdb.Error, MySQLdb.Warning) as e:
-    #     # Rolling back in case of error
-    #     print("db error")
-    #     print(e)
-    #     conn.rollback()
 
-
-    try:
-        selectSql = """select * from mini_program where group_id = %s
-        """
-        selectData = (1)
-        cursor.execute(selectSql, selectData)
-        conn.commit()
-
-        #Fetching 1st row from the table
-        result = cursor.fetchone();
-        print("db select")
-        print(result)
-
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
-        # Rolling back in case of error
-        print("db error")
-        print(e)
-        c   
-
-    schedule.every(3).seconds.do(work)
+    #schedule.every(3).seconds.do(work)
     
-    schedule.every(5).seconds.do(job)
+    schedule.every(15).seconds.do(job)
     # Loop so that the scheduling task
     # keeps on running all time.
     while True:
@@ -402,48 +378,6 @@ async def main():
         # is pending to run or not
         schedule.run_pending()
         time.sleep(1)
-
-    
-    # 定义BlockingScheduler
-    #sched = BlockingScheduler()
-    # sched = BackgroundScheduler()
-
-    # sched.add_job(job, 'interval', seconds=5)
-    # sched.start()
-
-    """
-    scheduler = BackgroundScheduler()
-
-    trigger = CronTrigger(
-        year="*", month="*", day="*", hour="*", minute="*", second="20"
-    )
-    trigger2 = CronTrigger(
-        year="*", month="*", day="*", hour="*", minute="*", second="30"
-    )
-    trigger3 = CronTrigger(
-        year="*", month="*", day="*", hour="*", minute="*", second="45"
-    )
-    scheduler.add_job(
-        foo,
-        trigger=trigger,
-        args=["hello world"],
-        name="9am",
-    )
-    scheduler.add_job(
-        foo,
-        trigger=trigger2,
-        args=["hello world"],
-        name="9am",
-    )
-    scheduler.add_job(
-        foo,
-        trigger=trigger3,
-        args=["hello world"],
-        name="9am",
-    )
-
-    scheduler.start()
-    """
 
     #
     # Make sure we have set WECHATY_PUPPET_SERVICE_TOKEN in the environment variables.
@@ -465,21 +399,15 @@ async def main():
             https://github.com/wechaty/python-wechaty-getting-started/#wechaty_puppet_service_token
         ''')
 
-    # 插入db
-    # sql = """INSERT keywordurl(keyword,url) 
-    #             values (%s, %s)"""
-    # cursor.execute(sql, 0)
-    # con.commit()
-
     #bot = Wechaty()
     # global bot
-    # bot = Wechaty()
+    bot = Wechaty()
 
-    # bot.on('scan',      on_scan)
-    # bot.on('login',     on_login)
-    # bot.on('message',   on_message)
+    bot.on('scan',      on_scan)
+    bot.on('login',     on_login)
+    bot.on('message',   on_message)
 
-    # await bot.start()
+    await bot.start()
 
     print('[Python Wechaty] Ding Dong Bot started.')
 
