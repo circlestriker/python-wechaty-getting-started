@@ -229,6 +229,7 @@ async def on_message(msg: Message):
         conversation_id = room.room_id #str
         room_name = await room.topic()
         talker: Contact = msg.talker()
+        await talker.ready()
         if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群":
             print(f"发消息的是郁金香等, 直接return")
             return
@@ -240,7 +241,8 @@ async def on_message(msg: Message):
                 # save the mini-program data as string
                 mini_program_data = asdict(mini_program.payload)
                 print('str of mini:', mini_program_data)
-                if "斑猪活动圈" in mini_program_data: #斑猪小程序才入db
+                appName = mini_program_data.get('description')
+                if "斑猪活动圈" in appName: #斑猪小程序才入db
                     # 插入db
                     try:
                         sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) values (%s, %s, %s, %s)"""
