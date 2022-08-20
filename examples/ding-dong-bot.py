@@ -27,6 +27,7 @@ from datetime import datetime
 
 import schedule
 import MySQLdb
+import json
 
 
 #import logging
@@ -165,24 +166,24 @@ keyword2reply = {
     '恋爱':'林黛玉贾宝玉的美好感情:https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
     '拍拖':'林黛玉贾宝玉的美好感情:https://mp.weixin.qq.com/s/6f3Japv1VNWFBTixYUBdHQ',
     #焦虑#
-    '绝望':'以毒攻毒:绝望中寻找希望:https://mp.weixin.qq.com/s/WlSeqHjVj4id6odDWGQeXQ',
-    '父母吵架':'慕容复骂老爹:https://mp.weixin.qq.com/s/0XlKT4lsIpVvHGyACZHkvQ',
-    '慕容复':'宝玉和慕容复为什么都魔怔?:https://mp.weixin.qq.com/s/A4glTxB6omaBddUFcD4eFg',
-    '玄奘':'唐太宗心理咨询玄奘:https://mp.weixin.qq.com/s/XtplxMxYVlaSFKE6Qbw3Nw',
-    #'桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
-    '神医':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
-    '加班太多':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg',
-    #'抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
-    '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
-    '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
-    '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
-    '抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
-    # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
-    #'抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
-    # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
-    '焦虑':'供参考-不放弃，就有康复的希望:https://mp.weixin.qq.com/s/O2nb-450640ankJqKkjsDA',
-    '学佛':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
-    '失眠':'失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg',
+    # '绝望':'以毒攻毒:绝望中寻找希望:https://mp.weixin.qq.com/s/WlSeqHjVj4id6odDWGQeXQ',
+    # '父母吵架':'慕容复骂老爹:https://mp.weixin.qq.com/s/0XlKT4lsIpVvHGyACZHkvQ',
+    # '慕容复':'宝玉和慕容复为什么都魔怔?:https://mp.weixin.qq.com/s/A4glTxB6omaBddUFcD4eFg',
+    # '玄奘':'唐太宗心理咨询玄奘:https://mp.weixin.qq.com/s/XtplxMxYVlaSFKE6Qbw3Nw',
+    # #'桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
+    # '神医':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
+    # '加班太多':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg',
+    # #'抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    # '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
+    # '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
+    # '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
+    # '抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
+    # # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
+    # #'抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
+    # # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
+    # '焦虑':'供参考-不放弃，就有康复的希望:https://mp.weixin.qq.com/s/O2nb-450640ankJqKkjsDA',
+    # '学佛':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    # '失眠':'失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg',
     #足球#
     '伤病':'伤病左右的友谊赛:https://mp.weixin.qq.com/s/tVPmb9spfr8Zq0pkB8HUrQ',
     '齐达内':'球场师徒缘:https://mp.weixin.qq.com/s/wq5M7busUmL8h1skLPuJ5Q',
@@ -244,9 +245,20 @@ async def on_message(msg: Message):
 
                 # 插入db
                 try:
-                    sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) 
-                        values (%s, %s, %s, %s)"""
-                    data = (room.room_id, room_name, mini_program_data, 0)
+                    sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) values (%s, %s, %s, %s)"""
+                    json_str = json.dumps(mini_program_data)
+                    activityIdStart = json_str.find('actionId%3D')
+                    activityIdStart += 11 #len of 'actionId%3D'
+                    activityId = 0
+                    print(f"activityId start at: %d" %(activityIdStart))
+                    if activityIdStart != -1:
+                        activityIdEnd = json_str.find('%', activityIdStart)
+                        print(f"activityId end at: %d" %(activityIdStart))
+                        if activityIdEnd != -1:
+                            activityId = int(json_str[activityIdStart:activityIdEnd])
+                    
+                    print(f"activityId is: %d" %(activityId))
+                    data = (room.room_id, room_name, json_str, activityId)
                     cursor.execute(sql, data)
                     conn.commit()
                 except (MySQLdb.Error, MySQLdb.Warning) as e:
@@ -255,8 +267,8 @@ async def on_message(msg: Message):
                     print(e)
                     conn.rollback()
 
-                if banzhuRoom is None:
-                    banzhuRoom = room
+                # if banzhuRoom is None:
+                #     banzhuRoom = room
 
                 # load the min-program
                 miniProgramDict['loaded'] = bot.MiniProgram.create_from_json(
@@ -284,16 +296,28 @@ async def on_message(msg: Message):
     （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
 
             #属于这个群的有效的活动 
-            selectSql = """select * from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
+            selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
             """
-            selectData = (1)
+            selectData = (room.room_id)
             cursor.execute(selectSql, selectData)
+            resRow = cursor.fetchone()
+            miniJsonStr = None
+            if resRow is not None:
+                miniJsonStr = resRow[0]
             conn.commit()
-
-            if miniProgramDict.get('loaded') is not None:
-                print('mini:', miniProgramDict.get('loaded').__dict__)
-                await room.say(miniProgramDict.get('loaded'))
+            if miniJsonStr is not None:
+                print('mini:', miniJsonStr)
+                miniJsonDict = json.loads(miniJsonStr)
+                miniProgram = bot.MiniProgram.create_from_json(
+                    payload_data= miniJsonDict #mini_program_data
+                )
+                await room.say(miniProgram)
             return
+
+            # if miniProgramDict.get('loaded') is not None:
+            #     print('mini:', miniProgramDict.get('loaded').__dict__)
+            #     await room.say(miniProgramDict.get('loaded'))
+            # return
     else:
         talker = None
         if msg.is_self():
@@ -364,21 +388,6 @@ async def main():
     """
     Async Main Entry
     """
-
-
-
-    #schedule.every(3).seconds.do(work)
-    
-    schedule.every(15).seconds.do(job)
-    # Loop so that the scheduling task
-    # keeps on running all time.
-    while True:
-
-        # Checks whether a scheduled task
-        # is pending to run or not
-        schedule.run_pending()
-        time.sleep(1)
-
     #
     # Make sure we have set WECHATY_PUPPET_SERVICE_TOKEN in the environment variables.
     # Learn more about services (and TOKEN) from https://wechaty.js.org/docs/puppet-services/
@@ -410,6 +419,19 @@ async def main():
     await bot.start()
 
     print('[Python Wechaty] Ding Dong Bot started.')
+
+    #schedule.every(3).seconds.do(work)
+    
+    schedule.every(15).seconds.do(job)
+    # Loop so that the scheduling task
+    # keeps on running all time.
+    while True:
+
+        # Checks whether a scheduled task
+        # is pending to run or not
+        schedule.run_pending()
+        time.sleep(1)
+
 
 
 asyncio.run(main())
