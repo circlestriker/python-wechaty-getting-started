@@ -217,12 +217,32 @@ banzhuRoom = None
 
 bot: Optional[Wechaty] = None
 
+def getMiniProgram(room: Room):
+    #属于这个群的有效的活动 
+    selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
+    """
+    selectData = (room.room_id)
+    cursor.execute(selectSql, selectData)
+    resRow = cursor.fetchone()
+    miniJsonStr = None
+    if resRow is not None:
+        miniJsonStr = resRow[0]
+    conn.commit()
+    miniProgram = None
+    if miniJsonStr is not None:
+        print('mini:', miniJsonStr)
+        miniJsonDict = json.loads(miniJsonStr)
+        miniProgram = bot.MiniProgram.create_from_json(
+            payload_data= miniJsonDict #mini_program_data
+        )
+    return miniProgram
+
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
     groupId-keyword-string-cnt
    """
-    time.sleep(30) #避免太快回复
+    time.sleep(3) #避免太快回复
     room = msg.room()
     conversation_id = ''
     if room is not None:
@@ -235,37 +255,37 @@ async def on_message(msg: Message):
             return
         
         # print(f"群聊名: {room_name}")
-        if "斑猪" in room_name:
-            if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
-                mini_program = await msg.to_mini_program()
-                # save the mini-program data as string
-                mini_program_data = asdict(mini_program.payload)
-                print('str of mini:', mini_program_data)
-                appName = mini_program_data.get('description')
-                if "斑猪活动圈" in appName: #斑猪小程序才入db
-                    # 插入db
-                    try:
-                        sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) values (%s, %s, %s, %s)"""
-                        json_str = json.dumps(mini_program_data)
-                        activityIdStart = json_str.find('actionId%3D')
-                        activityIdStart += 11 #len of 'actionId%3D'
-                        activityId = 0
-                        print(f"activityId start at: %d" %(activityIdStart))
-                        if activityIdStart != -1:
-                            activityIdEnd = json_str.find('%', activityIdStart)
-                            print(f"activityId end at: %d" %(activityIdStart))
-                            if activityIdEnd != -1:
-                                activityId = int(json_str[activityIdStart:activityIdEnd])
+        #if "斑猪" in room_name:
+        if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
+            mini_program = await msg.to_mini_program()
+            # save the mini-program data as string
+            mini_program_data = asdict(mini_program.payload)
+            print('str of mini:', mini_program_data)
+            appName = mini_program_data.get('description')
+            if "斑猪活动圈" in appName: #斑猪小程序才入db
+                # 插入db
+                try:
+                    sql = """INSERT into mini_program(group_id,group_name,json_str,activity_id) values (%s, %s, %s, %s)"""
+                    json_str = json.dumps(mini_program_data)
+                    activityIdStart = json_str.find('actionId%3D')
+                    activityIdStart += 11 #len of 'actionId%3D'
+                    activityId = 0
+                    print(f"activityId start at: %d" %(activityIdStart))
+                    if activityIdStart != -1:
+                        activityIdEnd = json_str.find('%', activityIdStart)
+                        print(f"activityId end at: %d" %(activityIdStart))
+                        if activityIdEnd != -1:
+                            activityId = int(json_str[activityIdStart:activityIdEnd])
 
-                        print(f"activityId is: %d" %(activityId))
-                        data = (room.room_id, room_name, json_str, activityId)
-                        cursor.execute(sql, data)
-                        conn.commit()
-                    except (MySQLdb.Error, MySQLdb.Warning) as e:
-                        # Rolling back in case of error
-                        print("db insert error")
-                        print(e)
-                        conn.rollback()
+                    print(f"activityId is: %d" %(activityId))
+                    data = (room.room_id, room_name, json_str, activityId)
+                    cursor.execute(sql, data)
+                    conn.commit()
+                except (MySQLdb.Error, MySQLdb.Warning) as e:
+                    # Rolling back in case of error
+                    print("db insert error")
+                    print(e)
+                    conn.rollback()
 
         if "斑猪" in room_name and "#活动" in msg.text():
             print(f"斑猪活动报名")
@@ -288,21 +308,30 @@ async def on_message(msg: Message):
     （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
 
             #属于这个群的有效的活动 
-            selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
-            """
-            selectData = (room.room_id)
-            cursor.execute(selectSql, selectData)
-            resRow = cursor.fetchone()
-            miniJsonStr = None
-            if resRow is not None:
-                miniJsonStr = resRow[0]
-            conn.commit()
-            if miniJsonStr is not None:
-                print('mini:', miniJsonStr)
-                miniJsonDict = json.loads(miniJsonStr)
-                miniProgram = bot.MiniProgram.create_from_json(
-                    payload_data= miniJsonDict #mini_program_data
-                )
+            # selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
+            # """
+            # selectData = (room.room_id)
+            # cursor.execute(selectSql, selectData)
+            # resRow = cursor.fetchone()
+            # miniJsonStr = None
+            # if resRow is not None:
+            #     miniJsonStr = resRow[0]
+            # conn.commit()
+            # if miniJsonStr is not None:
+            #     print('mini:', miniJsonStr)
+            #     miniJsonDict = json.loads(miniJsonStr)
+            #     miniProgram = bot.MiniProgram.create_from_json(
+            #         payload_data= miniJsonDict #mini_program_data
+            #     )
+            #     global banzhuRoom
+            #     if banzhuRoom is None:
+            #         banzhuRoom = room
+            #     await room.say(miniProgram)
+            miniProgram = getMiniProgram(room)
+            if miniProgram is not None:
+                global banzhuRoom
+                if banzhuRoom is None:
+                    banzhuRoom = room
                 await room.say(miniProgram)
             return
     else:
@@ -364,16 +393,24 @@ async def on_login(user: Contact):
 def foo(str):
     print("Hello World")
 
-def job():
+async def sendMiniProgram():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("定时发活动")
+    global banzhuRoom
+    miniProgram = getMiniProgram(banzhuRoom)
+    if miniProgram is not None and banzhuRoom is not None:
+        await banzhuRoom.say(miniProgram)
     
-def work():
-    print("Study and work hard")
+botStarted = 0        
+async def work():
+    global botStarted
+    if botStarted == 0:
+        print("bot start...")
+        await bot.start()
+    else:
+        botStarted = 1
     
 async def main():
-    """
-    Async Main Entry
-    """
     #
     # Make sure we have set WECHATY_PUPPET_SERVICE_TOKEN in the environment variables.
     # Learn more about services (and TOKEN) from https://wechaty.js.org/docs/puppet-services/
@@ -401,18 +438,16 @@ async def main():
     bot.on('scan',      on_scan)
     bot.on('login',     on_login)
     bot.on('message',   on_message)
-
-    await bot.start()
-
     print('[Python Wechaty] Ding Dong Bot started.')
 
-    #schedule.every(3).seconds.do(work)
-    
-    schedule.every(15).seconds.do(job)
+    #await bot.start()
+
+    schedule.every(5).seconds.do(work)
+    schedule.every(8).seconds.do(sendMiniProgram)
     # Loop so that the scheduling task
     # keeps on running all time.
+    print('开启定时器')
     while True:
-
         # Checks whether a scheduled task
         # is pending to run or not
         schedule.run_pending()
