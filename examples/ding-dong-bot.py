@@ -25,6 +25,9 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.blocking import BlockingScheduler
 from datetime import datetime
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+
 import schedule
 import MySQLdb
 import json
@@ -250,7 +253,7 @@ async def on_message(msg: Message):
         room_name = await room.topic()
         talker: Contact = msg.talker()
         await talker.ready()
-        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群":
+        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name:
             print(f"发消息的是郁金香等, 直接return")
             return
         
@@ -390,25 +393,24 @@ async def on_login(user: Contact):
     print(user)
     # TODO: To be written
 
-def foo(str):
-    print("Hello World")
-
 async def sendMiniProgram():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("定时发活动")
+    print("定时发活动...")
     global banzhuRoom
+    if banzhuRoom is None:
+        return
     miniProgram = getMiniProgram(banzhuRoom)
     if miniProgram is not None and banzhuRoom is not None:
         await banzhuRoom.say(miniProgram)
     
-botStarted = 0        
-async def work():
-    global botStarted
-    if botStarted == 0:
-        print("bot start...")
-        await bot.start()
-    else:
-        botStarted = 1
+# botStarted = 0        
+# async def work():
+#     global botStarted
+#     if botStarted == 0:
+#         print("bot start...")
+#         await bot.start()
+#     else:
+#         botStarted = 1
     
 async def main():
     #
@@ -440,10 +442,22 @@ async def main():
     bot.on('message',   on_message)
     print('[Python Wechaty] Ding Dong Bot started.')
 
-    #await bot.start()
+    scheduler = AsyncIOScheduler()
+    #scheduler.add_job(sendMiniProgram, "interval", seconds=5)
+    scheduler.add_job(sendMiniProgram, "cron", day="*", hour=22)
 
-    schedule.every(5).seconds.do(work)
-    schedule.every(8).seconds.do(sendMiniProgram)
+    scheduler.start()
+
+    #asyncio.get_event_loop().run_forever()
+
+    await bot.start()
+
+    # asyncScheduler = AsyncIOScheduler()
+    # asyncScheduler.add_job(sendMiniProgram, 'cron', minute='*', jitter=1)
+    # asyncScheduler.start()
+
+    #schedule.every(5).seconds.do(work)
+    #schedule.every(5).seconds.do(triggerMini)
     # Loop so that the scheduling task
     # keeps on running all time.
     print('开启定时器')
