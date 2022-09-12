@@ -16,6 +16,7 @@ limitations under the License.
 import os
 import asyncio
 import time
+import threading
 import pymysql
 from typing import Optional
 
@@ -220,11 +221,11 @@ banzhuRoom = None
 
 bot: Optional[Wechaty] = None
 
-def getMiniProgram(room: Room):
-    #属于这个群的有效的活动 
+def getMiniProgram(room_id):
+    #属于这个群的有效的活动, 暂取最后一个
     selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
     """
-    selectData = (room.room_id)
+    selectData = (room_id)
     cursor.execute(selectSql, selectData)
     resRow = cursor.fetchone()
     miniJsonStr = None
@@ -330,7 +331,7 @@ async def on_message(msg: Message):
             #     if banzhuRoom is None:
             #         banzhuRoom = room
             #     await room.say(miniProgram)
-            miniProgram = getMiniProgram(room)
+            miniProgram = getMiniProgram(room.room_id)
             if miniProgram is not None:
                 global banzhuRoom
                 if banzhuRoom is None:
@@ -393,16 +394,20 @@ async def on_login(user: Contact):
     print(user)
     # TODO: To be written
 
-async def sendMiniProgram():
+    
+#<Room <22958121966@chatroom - 斑猪运营群>> set payload more than once
+async def sendMiniProgram(roomId):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("定时发活动...")
-    global banzhuRoom
-    if banzhuRoom is None:
+    # 等待登入
+    tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
+    if tmpRoom is None:
+        print("room is null !!!")
         return
-    miniProgram = getMiniProgram(banzhuRoom)
-    if miniProgram is not None and banzhuRoom is not None:
-        await banzhuRoom.say(miniProgram)
-    
+    miniProgram = getMiniProgram(roomId)
+    if miniProgram is not None:
+        await tmpRoom.say(miniProgram)
+
 # botStarted = 0        
 # async def work():
 #     global botStarted
@@ -443,8 +448,8 @@ async def main():
     print('[Python Wechaty] Ding Dong Bot started.')
 
     scheduler = AsyncIOScheduler()
-    #scheduler.add_job(sendMiniProgram, "interval", seconds=5)
-    scheduler.add_job(sendMiniProgram, "cron", day="*", hour=22)
+    scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
+    #scheduler.add_job(sendMiniProgram, "cron", day="*", hour=22)
 
     scheduler.start()
 
@@ -460,13 +465,57 @@ async def main():
     #schedule.every(5).seconds.do(triggerMini)
     # Loop so that the scheduling task
     # keeps on running all time.
-    print('开启定时器')
-    while True:
-        # Checks whether a scheduled task
-        # is pending to run or not
-        schedule.run_pending()
-        time.sleep(1)
+    # print('开启定时器')
+    # while True:
+    #     # Checks whether a scheduled task
+    #     # is pending to run or not
+    #     schedule.run_pending()
+    #     time.sleep(1)
 
+class ServerThreading(threading.Thread):
+    def __init__(self,clientsocket,recvsize=1024*1024,encoding="utf-8"):
+        threading.Thread.__init__(self)
+        self._socket = clientsocket
+        self._recvsize = recvsize
+        self._encoding = encoding
+        pass
 
+    def run(self):
+        print("开启线程.....")
+        try: #接受数据
+            msg = ''
+            get1stframe = 1
+            bTest = 0
+            while True:
+                # 读取recvsize个字节
+                rec = self._socket.recv(self._recvsize)
+                # 解码
+                msg += rec.decode(self._encoding)
+
+                if msg.strip().endswith('test'): #测试test/开发dev环境的最后4个字节必须传test
+                    msg=msg[:-4] #去掉尾部的'test'
+                    bTest = 1
+                # 文本接受是否完毕，因为python socket不能自己判断接收数据是否完毕，
+                # 所以需要自定义协议标志数据接受完毕
+                if msg.strip().endswith('over-1stframe'):
+                    sendMiniProgram()
+                    break
+
+            # 发送数据
+            self._socket.send(("%s"%sendmsg).encode(self._encoding))
+            pass
+        except Exception as identifier:
+            self._socket.send("500".encode(self._encoding))
+            print(identifier)
+            pass
+        finally:
+            self._socket.close()
+        print("任务结束.....")
+
+        pass
+
+    def __del__(self):
+        pass                    
 
 asyncio.run(main())
+
