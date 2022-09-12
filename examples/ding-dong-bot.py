@@ -277,7 +277,7 @@ async def on_message(msg: Message):
                     print(f"activityId start at: %d" %(activityIdStart))
                     if activityIdStart != -1:
                         activityIdEnd = json_str.find('%', activityIdStart)
-                        print(f"activityId end at: %d" %(activityIdStart))
+                        print(f"activityId end at: %d" %(activityIdEnd))
                         if activityIdEnd != -1:
                             activityId = int(json_str[activityIdStart:activityIdEnd])
 
@@ -291,46 +291,26 @@ async def on_message(msg: Message):
                     print(e)
                     conn.rollback()
 
-        if "斑猪" in room_name and "#活动" in msg.text():
+        if "斑猪" in room_name and "活动" in msg.text():
             print(f"斑猪活动报名")
-            await msg.say('''【得闲打球】
-    ⏱07/20 周三 | 13:29 至 08/21 周四 | 13:29
-    📍杨协成时尚工场A座协爽(海珠区赤岗西路)
-    📍广东省广州市海珠区江贝安定里
-    💰报名后付费
+    #         await msg.say('''【得闲打球】
+    # ⏱07/20 周三 | 13:29 至 08/21 周四 | 13:29
+    # 📍杨协成时尚工场A座协爽(海珠区赤岗西路)
+    # 📍广东省广州市海珠区江贝安定里
+    # 💰报名后付费
 
-    【报名 1/不限】
-    1、弯腰捡球爱好者 🌹
-    2、
-    3、
+    # 【报名 1/不限】
+    # 1、弯腰捡球爱好者 🌹
+    # 2、
+    # 3、
 
-    ❗报名截止时间：2022-8-20 13:29:00
+    # ❗报名截止时间：2022-8-20 13:29:00
 
 
-    更多内容点击下方链接👇👇👇
+    # 更多内容点击下方链接👇👇👇
 
-    （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
+    # （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
 
-            #属于这个群的有效的活动 
-            # selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
-            # """
-            # selectData = (room.room_id)
-            # cursor.execute(selectSql, selectData)
-            # resRow = cursor.fetchone()
-            # miniJsonStr = None
-            # if resRow is not None:
-            #     miniJsonStr = resRow[0]
-            # conn.commit()
-            # if miniJsonStr is not None:
-            #     print('mini:', miniJsonStr)
-            #     miniJsonDict = json.loads(miniJsonStr)
-            #     miniProgram = bot.MiniProgram.create_from_json(
-            #         payload_data= miniJsonDict #mini_program_data
-            #     )
-            #     global banzhuRoom
-            #     if banzhuRoom is None:
-            #         banzhuRoom = room
-            #     await room.say(miniProgram)
             miniProgram = getMiniProgram(room.room_id)
             if miniProgram is not None:
                 global banzhuRoom
@@ -408,14 +388,6 @@ async def sendMiniProgram(roomId):
     if miniProgram is not None:
         await tmpRoom.say(miniProgram)
 
-# botStarted = 0        
-# async def work():
-#     global botStarted
-#     if botStarted == 0:
-#         print("bot start...")
-#         await bot.start()
-#     else:
-#         botStarted = 1
     
 async def main():
     #
@@ -454,24 +426,8 @@ async def main():
 
     scheduler.start()
 
-    #asyncio.get_event_loop().run_forever()
-
     await bot.start()
 
-    # asyncScheduler = AsyncIOScheduler()
-    # asyncScheduler.add_job(sendMiniProgram, 'cron', minute='*', jitter=1)
-    # asyncScheduler.start()
-
-    #schedule.every(5).seconds.do(work)
-    #schedule.every(5).seconds.do(triggerMini)
-    # Loop so that the scheduling task
-    # keeps on running all time.
-    # print('开启定时器')
-    # while True:
-    #     # Checks whether a scheduled task
-    #     # is pending to run or not
-    #     schedule.run_pending()
-    #     time.sleep(1)
 
 class ServerThreading(threading.Thread):
     def __init__(self,clientsocket,recvsize=1024*1024,encoding="utf-8"):
