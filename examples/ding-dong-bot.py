@@ -448,8 +448,9 @@ async def main():
     print('[Python Wechaty] Ding Dong Bot started.')
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    #scheduler.add_job(sendMiniProgram, "cron", day="*", hour=22)
+    #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=30, hour=14, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=30, hour=18, args=['19893951839@chatroom']) #ok
 
     scheduler.start()
 
