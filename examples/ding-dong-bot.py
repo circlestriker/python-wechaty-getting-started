@@ -18,6 +18,7 @@ import asyncio
 import time
 import threading
 import pymysql
+import json
 from typing import Optional
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -221,6 +222,29 @@ banzhuRoom = None
 
 bot: Optional[Wechaty] = None
 
+def parseCircleBindRoom():
+    selectSql = """select name, circleId, circleCode, chatGroupCode, timing->'$[0]', timing->'$[1]',timing->'$[2]',keywords from banzhu_circle_chatgroup where enable = 1 ORDER BY id DESC
+    """
+    #selectSql = """select name, circleId, circleCode, chatGroupCode, timing->'$[0]', timing->'$[1]',timing->'$[2]',keywords, from banzhu_circle_chatgroup where enable = 1 ORDER BY id DESC
+    cursor.execute(selectSql)
+    rows = cursor.fetchall()
+    for row in rows:
+        print(f'---------{row[0]} {row[1]} {row[2]}')
+        roomId = row[3]
+        print(roomId)
+        hour0 = row[4]
+        hour1 = row[5]
+        hour2 = row[6]
+        print(hour0)
+        print(hour1)
+        print(hour2)
+        #print(f"{%s} {%s} {%s}" % (hour0, hour1, hour2))
+
+        
+
+
+    
+
 def getMiniProgram(room_id):
     #属于这个群的有效的活动, 暂取最后一个
     selectSql = """select json_str from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
@@ -403,6 +427,9 @@ async def main():
     # os.environ['token'] = 'puppet_paimon_your_token'
     # os.environ['token'] = 'puppet_wxwork_your_token'
     #     
+    parseCircleBindRoom()
+    return
+
     if 'WECHATY_PUPPET_SERVICE_TOKEN' not in os.environ:
         print('''
             Error: WECHATY_PUPPET_SERVICE_TOKEN is not found in the environment variables
@@ -421,8 +448,9 @@ async def main():
 
     scheduler = AsyncIOScheduler()
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=30, hour=14, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=30, hour=18, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=38, hour=15, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=39, hour=15, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=40, hour=15, args=['19893951839@chatroom']) #ok
 
     scheduler.start()
 
