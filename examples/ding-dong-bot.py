@@ -30,7 +30,6 @@ from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
-import schedule
 import MySQLdb
 import json
 
@@ -51,6 +50,8 @@ from wechaty import (
     Room,
 )
 
+
+scheduler = AsyncIOScheduler()
 
 conversationDict = {}
 keyword2reply = {
@@ -239,9 +240,11 @@ def parseCircleBindRoom():
         print(hour1)
         print(hour2)
         #print(f"{%s} {%s} {%s}" % (hour0, hour1, hour2))
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour1, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour2, args=[roomId]) #ok
 
-        
-
+    scheduler.start()
 
     
 
@@ -307,6 +310,15 @@ async def on_message(msg: Message):
 
                     print(f"activityId is: %d" %(activityId))
                     data = (room.room_id, room_name, json_str, activityId)
+                    # 先查询，有就不insert
+                    selectSql = """select * from mini_program where group_id = %s and activity_id = %s"""
+                    selectData = (room.room_id, activityId)
+                    cursor.execute(selectSql, selectData)
+                    resRow = cursor.fetchone()
+                    if resRow is not None:
+                        print("insert before!!")
+                        return
+
                     cursor.execute(sql, data)
                     conn.commit()
                 except (MySQLdb.Error, MySQLdb.Warning) as e:
@@ -427,8 +439,6 @@ async def main():
     # os.environ['token'] = 'puppet_paimon_your_token'
     # os.environ['token'] = 'puppet_wxwork_your_token'
     #     
-    parseCircleBindRoom()
-    return
 
     if 'WECHATY_PUPPET_SERVICE_TOKEN' not in os.environ:
         print('''
@@ -446,13 +456,9 @@ async def main():
     bot.on('message',   on_message)
     print('[Python Wechaty] Ding Dong Bot started.')
 
-    scheduler = AsyncIOScheduler()
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=38, hour=15, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=39, hour=15, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=40, hour=15, args=['19893951839@chatroom']) #ok
-
-    scheduler.start()
+    # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=38, hour=15, args=['19893951839@chatroom']) #ok
+    parseCircleBindRoom()
 
     await bot.start()
 
