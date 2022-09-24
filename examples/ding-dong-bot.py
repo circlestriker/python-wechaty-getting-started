@@ -33,6 +33,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import MySQLdb
 import json
 
+import base64
+
 
 #import logging
 
@@ -327,6 +329,10 @@ async def on_message(msg: Message):
                     print(e)
                     conn.rollback()
 
+        if msg.text().startswith("bd-"):
+            bindCircleAndRoom(circleIdStr, strRoomId)
+                    
+                    
         if "斑猪" in room_name and "活动" in msg.text():
             print(f"斑猪活动报名")
     #         await msg.say('''【得闲打球】
@@ -424,6 +430,26 @@ async def sendMiniProgram(roomId):
     if miniProgram is not None:
         await tmpRoom.say(miniProgram)
 
+#circleIdStr: bd-circleId-xxxxxxx
+def bindCircleAndRoom(circleIdStr, strRoomId):
+    print(f"bindCircleAndRoom|circle:%s|roomId:%s" %(strCircle, strRoomId))
+    circleIdStart = 3
+    circleIdEnd = circleIdStr.find('-', circleIdStart)
+    circleId = -1
+    if circleIdEnd != -1:
+        circleId = int(circleIdStr[activityIdStart:activityIdEnd])
+        if circleId is -1:
+            print("circleIs == -1 !!!")
+            return
+    try:
+        sql = """INSERT INTO banzhu_circle_chatgroup(circleId, chatGroupCode) VALUES(%d, %s)"""
+        data = (circleId, strRoomId)
+        cursor.execute(sql, data)
+        conn.commit()
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+        print("db insert error")
+        print(e)
+        conn.rollback()
     
 async def main():
     #
