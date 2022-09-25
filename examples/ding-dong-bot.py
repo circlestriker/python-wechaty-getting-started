@@ -181,11 +181,11 @@ keyword2reply = {
     #'桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
     '神医':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
     '加班太多':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg',
-    #'抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
-    '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
+    '抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    #'抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
     '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
-    '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
     '抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
+    '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
     # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
     #'抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
     # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
@@ -275,7 +275,6 @@ async def on_message(msg: Message):
     Message Handler for the Bot
     groupId-keyword-string-cnt
    """
-    time.sleep(3) #避免太快回复
     room = msg.room()
     conversation_id = ''
     if room is not None:
@@ -283,7 +282,7 @@ async def on_message(msg: Message):
         room_name = await room.topic()
         talker: Contact = msg.talker()
         await talker.ready()
-        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name:
+        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name or '2002届高三' in room_name:
             print(f"发消息的是郁金香等, 直接return")
             return
         
@@ -371,6 +370,7 @@ async def on_message(msg: Message):
         conversation_id = talker.contact_id
         
     #replyOnKeyword(conversation_id, msg)
+    time.sleep(120) #避免太快回复
     for keyword in keyword2reply:
         if (keyword in msg.text()):
             reply = keyword2reply.get(keyword)
@@ -430,17 +430,16 @@ async def sendMiniProgram(roomId):
     if miniProgram is not None:
         await tmpRoom.say(miniProgram)
 
-#circleIdStr: bd-circleId-xxxxxxx
+#circleIdStr: bd-xxxxxxx . xxxxxxx是circleId的base64编码
 def bindCircleAndRoom(circleIdStr, strRoomId):
     print(f"bindCircleAndRoom|circle:%s|roomId:%s" %(strCircle, strRoomId))
     circleIdStart = 3
-    circleIdEnd = circleIdStr.find('-', circleIdStart)
-    circleId = -1
-    if circleIdEnd != -1:
-        circleId = int(circleIdStr[activityIdStart:activityIdEnd])
-        if circleId is -1:
-            print("circleIs == -1 !!!")
-            return
+    circleIdBase64 = circleIdStr[circleIdStart:]
+    strCircleId = base64.b64decode(circleIdBase64)
+    circleId = int(strCircleId) 
+    if circleId is -1:
+        print("circleIs == -1 !!!")
+        return
     try:
         sql = """INSERT INTO banzhu_circle_chatgroup(circleId, chatGroupCode) VALUES(%d, %s)"""
         data = (circleId, strRoomId)
