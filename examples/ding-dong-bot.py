@@ -271,19 +271,50 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
+async def sendWukongUrl(roomId):
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("定时发活动...{roomId}")
+    # 等待登入
+    tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
+    if tmpRoom is None:
+        print("room is null !!!")
+        return
+    miniProgram = getMiniProgram(roomId)
+    if miniProgram is not None:
+        await tmpRoom.say(miniProgram)
+
+def SendGroupAtTime:
+    selectSql = """select group_id from group_info
+    """
+    cursorEs.execute(selectSql)
+    rows = cursorEs.fetchall()
+    for row in rows:
+        roomId = row[0]
+        sendWukongUrl(roomId)
+
+    
 def InsertGroupInfo(room_id, room_name):
-    print(f"InsertGroupInfo|群: {room_name}")
     if "渡过" in room_name or '悟空援助' in room_name or '一休治郁' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
         or "抑郁症" in room_name or "走向开心" in room_name:
-            try:
-                sql = """INSERT INTO group_info(group_id, group_name) VALUES(%d, %s)"""
-                data = (room_id, room_name)
-                cursorEs.execute(sql, data)
-                connEs.commit()
-            except (MySQLdb.Error, MySQLdb.Warning) as e:
-                print("db insert error")
-                print(e)
-                connEs.rollback()
+        print(f"InsertGroupInfo|群: {room_name}")
+        # 先查询，有就不insert
+        selectSql = """select * from group_info where room_id = %s"""
+        selectData = (room_id)
+        cursorEs.execute(selectSql, selectData)
+        resRow = cursorEs.fetchone()
+        if resRow is not None:
+            print("insert before!! | {room_id}")
+            return
+        
+        try:
+            sql = """INSERT INTO group_info(group_id, group_name) VALUES(%s, %s)"""
+            data = (room_id, room_name)
+            cursorEs.execute(sql, data)
+            connEs.commit()
+        except (MySQLdb.Error, MySQLdb.Warning) as e:
+            print("db insert error")
+            print(e)
+            connEs.rollback()
     
 async def on_message(msg: Message):
     """
@@ -386,7 +417,7 @@ async def on_message(msg: Message):
         conversation_id = talker.contact_id
         
     #replyOnKeyword(conversation_id, msg)
-    time.sleep(120) #避免太快回复
+    time.sleep(3) #避免太快回复
     for keyword in keyword2reply:
         if (keyword in msg.text()):
             reply = keyword2reply.get(keyword)
@@ -436,7 +467,7 @@ async def on_login(user: Contact):
 #<Room <22958121966@chatroom - 斑猪运营群>> set payload more than once
 async def sendMiniProgram(roomId):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("定时发活动...")
+    print("定时发活动...{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
