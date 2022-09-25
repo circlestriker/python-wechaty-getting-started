@@ -315,7 +315,19 @@ def InsertGroupInfo(room_id, room_name):
             print("db insert error")
             print(e)
             connEs.rollback()
-    
+
+def InsertKeywordReply(keyword, reply):   
+    # 插入keyword-reply
+    try:
+        sql = """INSERT INTO keyword_reply(keyword, reply) VALUES(%s, %s)"""
+        data = (keyword, reply)
+        cursorEs.execute(sql, data)
+        connEs.commit()
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+        print("db insert error")
+        print(e)
+        connEs.rollback()
+            
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
@@ -421,6 +433,9 @@ async def on_message(msg: Message):
     for keyword in keyword2reply:
         if (keyword in msg.text()):
             reply = keyword2reply.get(keyword)
+            
+            InsertKeywordReply(keyword, reply)
+
             print('找到keyword: %s | %s' %(keyword, reply))
             keyDic = conversationDict.get(conversation_id)
             if keyDic is None:
