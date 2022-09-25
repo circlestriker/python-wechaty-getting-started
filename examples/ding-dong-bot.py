@@ -216,10 +216,11 @@ keyword2reply = {
     }
 
 #连接数据库
-#conn = pymysql.connect(host="127.0.0.1", user="root", passwd="Qlcx1997", db='keys', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
+connEs = pymysql.connect(host="127.0.0.1", user="root", passwd="Qlcx1997", db='keywords', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
 conn = pymysql.connect(host="120.77.62.108", user="hscl", passwd="Huishuchuanglian2022banzhu", db='banzhutest', charset='utf8', port=3306)  #和mysql服务端设置格式一样（还可设置为gbk, gb2312）
 #创建游标
 cursor = conn.cursor()
+cursorEs = connEs.cursor()
 
 banzhuRoom = None
 
@@ -270,6 +271,20 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
+def InsertGroupInfo(room_id, room_name):
+    print(f"InsertGroupInfo|群: {room_name}")
+    if "渡过" in room_name or '悟空援助' in room_name or '一休治郁' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
+        or "抑郁症" in room_name or "走向开心" in room_name:
+            try:
+                sql = """INSERT INTO group_info(group_id, group_name) VALUES(%d, %s)"""
+                data = (room_id, room_name)
+                cursorEs.execute(sql, data)
+                connEs.commit()
+            except (MySQLdb.Error, MySQLdb.Warning) as e:
+                print("db insert error")
+                print(e)
+                connEs.rollback()
+    
 async def on_message(msg: Message):
     """
     Message Handler for the Bot
@@ -286,7 +301,8 @@ async def on_message(msg: Message):
             print(f"发消息的是郁金香等, 直接return")
             return
         
-        # print(f"群聊名: {room_name}")
+        InsertGroupInfo(room.room_id, room_name)
+
         #if "斑猪" in room_name:
         if msg.type() == MessageType.MESSAGE_TYPE_MINI_PROGRAM:
             mini_program = await msg.to_mini_program()
