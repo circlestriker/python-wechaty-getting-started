@@ -271,27 +271,35 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
-async def sendWukongUrl(roomId):
+def getWukongReply:
+    selectReply = """select reply from keyword_reply where group_type = 0 order by cnt limit 1"""
+    cursorEs.execute(selectReply)
+    rowRes = cursorEs.fetchone()
+    return rowRes[0]
+    
+async def sendWukongReply(roomId, reply):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("定时发活动...{roomId}")
+    print("定时发悟空援助url...|{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
-        print("room is null !!!")
+        print("room{roomId} is null !!!")
         return
-    miniProgram = getMiniProgram(roomId)
-    if miniProgram is not None:
-        await tmpRoom.say(miniProgram)
+    #await msg.say(reply)
+    if reply is not None:
+        await tmpRoom.say(reply)
 
-def SendGroupAtTime:
+async def SendWukongAtTime:
     selectSql = """select group_id from group_info
     """
     cursorEs.execute(selectSql)
     rows = cursorEs.fetchall()
+    reply = getWukongReply(roomId)
     for row in rows:
         roomId = row[0]
-        sendWukongUrl(roomId)
+        sendWukongReply(roomId, reply)
 
+    #cnt+1
     
 def InsertGroupInfo(room_id, room_name):
     if "渡过" in room_name or '悟空援助' in room_name or '一休治郁' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
@@ -544,7 +552,7 @@ async def main():
     print('[Python Wechaty] Ding Dong Bot started.')
 
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=38, hour=15, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=0, hour=20) #ok
     parseCircleBindRoom()
 
     await bot.start()
