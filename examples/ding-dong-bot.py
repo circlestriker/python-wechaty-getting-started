@@ -181,15 +181,16 @@ keyword2reply = {
     #'桂林':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
     '神医':'桂林遇神医:https://mp.weixin.qq.com/s/kqt9pr_bJ-wImkOdqPmF6w',
     '加班太多':'加班太多，本来谁可能帮到毛星云?: https://mp.weixin.qq.com/s/MZuuCL9QUkyIFdw6tXT4Hg',
-    '抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
-    #'抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
+    #'抑郁症':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
+    '抑郁症':'世外高人治抑郁-曹政的知见障:https://mp.weixin.qq.com/s/CMFAGjhDv_6UH8w16aN7hQ',
     '跳楼':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
-    '抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
-    '抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
+    '抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
+    #'抑郁':'谁来帮助医学院逝去的学生? https://mp.weixin.qq.com/s/U9MdAbw8958MTVh9KeAoAQ',
+    #'抑郁':'帮助状态不好朋友的错误言行:https://mp.weixin.qq.com/s/3WvrpRB1-AjUao7d7-MJ5A',
     # '抑郁':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
-    #'抑郁':'供参考-康复的例子: 顿悟和康复:https://mp.weixin.qq.com/s/Qdlm3eb_J482jmo5eMvrCA',
     # '焦虑':'焦虑可以参考这个, 看书康复的例子:https://mp.weixin.qq.com/s/kkX1I25oM5-UGcYoFqd2QA',
-    '焦虑':'供参考-不放弃，就有康复的希望:https://mp.weixin.qq.com/s/O2nb-450640ankJqKkjsDA',
+    #'焦虑':'供参考-不放弃，就有康复的希望:https://mp.weixin.qq.com/s/O2nb-450640ankJqKkjsDA',
+     '焦虑':'抑郁焦虑可以参考这个-金刚经为什么可以救人:https://mp.weixin.qq.com/s/d0e0Ns7OgqqqMYhqncwLYw',
     '学佛':'可以参考这个-佛祖因抑郁症而觉悟:https://mp.weixin.qq.com/s/GJ4TxPYjCAiw1jqrjOH2Mg',
     '失眠':'失眠可以参考这个-数息法治失眠:https://mp.weixin.qq.com/s/SQfaegwTa0gCu2mjfUkezg',
     #足球#
@@ -271,7 +272,37 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
-def getWukongReply:
+#无记录or7天过了都可以
+def updateReplyRecord(room_id, reply_id):
+    selectReply = """select id, reply from room_reply_record where room_id = %s and reply_id = %d and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
+    selectData = (room_id, reply_id)
+    cursorEs.execute(selectReply, selectData)
+    rowRes = cursorEs.fetchone()
+    if rowRes is not None:
+        return False 
+    updateReply = """update room_reply_record set cnt = cnt+1, update_time = NOW() where room_id = %s and reply_id = %d""" 
+    updateData = (room_id, reply_id)
+    cursorEs.execute(selectReply, selectData)
+    cursorEs.commit()
+    if cursorEs.rowcount < 1: # update failed
+        sql = """INSERT INTO room_reply_record(room_id, reply_id, cnt, add_time, update_time) VALUES(%s, %d, %d, now(), now())"""
+        data = (room_id, reply_id, 1)
+        cursorEs.execute(sql, data)
+        connEs.commit()
+    return True
+    
+def getAndUpdateWukongReplyWithKeyword(keyword):
+    selectReply = """select id, reply from keyword_reply where keyword = %s and date(update_time) < (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内发过不发
+    selectData = (keyword)
+    cursorEs.execute(selectReply, selectData)
+    rowRes = cursorEs.fetchall()
+    for row in rowRes:
+        if updateReplyRecord(room_id, row[0]):
+            return row[1] 
+    print("{keyword} 对应的回复最近7天发过，不再发。")
+    return None
+    
+def getWukongReply():
     selectReply = """select reply from keyword_reply where group_type = 0 order by cnt limit 1"""
     cursorEs.execute(selectReply)
     rowRes = cursorEs.fetchone()
@@ -289,7 +320,7 @@ async def sendWukongReply(roomId, reply):
     if reply is not None:
         await tmpRoom.say(reply)
 
-async def SendWukongAtTime:
+async def SendWukongAtTime():
     selectSql = """select group_id from group_info
     """
     cursorEs.execute(selectSql)
@@ -306,7 +337,7 @@ def InsertGroupInfo(room_id, room_name):
         or "抑郁症" in room_name or "走向开心" in room_name:
         print(f"InsertGroupInfo|群: {room_name}")
         # 先查询，有就不insert
-        selectSql = """select * from group_info where room_id = %s"""
+        selectSql = """select * from group_info where group_id = %s"""
         selectData = (room_id)
         cursorEs.execute(selectSql, selectData)
         resRow = cursorEs.fetchone()
@@ -439,11 +470,13 @@ async def on_message(msg: Message):
     #replyOnKeyword(conversation_id, msg)
     time.sleep(3) #避免太快回复
     for keyword in keyword2reply:
+        #reply0 = keyword2reply.get(keyword)
+        #InsertKeywordReply(keyword, reply0)
         if (keyword in msg.text()):
-            reply = keyword2reply.get(keyword)
-            
-            InsertKeywordReply(keyword, reply)
-
+            reply = getAndUpdateWukongReplyWithKeyword(keyword)
+            if reply is None:
+                continue
+            #reply = keyword2reply.get(keyword)
             print('找到keyword: %s | %s' %(keyword, reply))
             keyDic = conversationDict.get(conversation_id)
             if keyDic is None:
@@ -452,11 +485,6 @@ async def on_message(msg: Message):
                 keyDic[keyword] = 1
                 conversationDict[conversation_id] = keyDic
                 await msg.say(reply)
-                if(keyword == '滨江花园'):
-                    #imgFile = FileBox.fromLocal('/home/dev/py/wangning.jpeg')
-                    imgFile = FileBox.from_file('/home/dev/py/wangning.jpeg')
-                    await msg.say(imgFile)
-
                 break #一个群一次只回复一个匹配
             elif keyDic.get(keyword) is None:
                 #print('keyDic:',keyDic.__dict__)
@@ -507,7 +535,7 @@ def bindCircleAndRoom(circleIdStr, strRoomId):
     circleIdBase64 = circleIdStr[circleIdStart:]
     strCircleId = base64.b64decode(circleIdBase64)
     circleId = int(strCircleId) 
-    if circleId is -1:
+    if circleId == -1:
         print("circleIs == -1 !!!")
         return
     try:
