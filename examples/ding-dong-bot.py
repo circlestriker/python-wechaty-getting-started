@@ -274,25 +274,27 @@ def getMiniProgram(room_id):
 
 #无记录or7天过了都可以
 def updateReplyRecord(room_id, reply_id):
-    selectReply = """select id, reply from room_reply_record where room_id = %s and reply_id = %d and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
+    selectReply = """select id from room_reply_record where room_id = %s and reply_id = %s and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
     selectData = (room_id, reply_id)
+    print(type(reply_id))
     cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchone()
     if rowRes is not None:
         return False 
-    updateReply = """update room_reply_record set cnt = cnt+1, update_time = NOW() where room_id = %s and reply_id = %d""" 
+    updateReply = """update room_reply_record set cnt = cnt+1, update_time = NOW() where room_id = %s and reply_id = %s""" 
     updateData = (room_id, reply_id)
     cursorEs.execute(selectReply, selectData)
-    cursorEs.commit()
+    connEs.commit()
     if cursorEs.rowcount < 1: # update failed
-        sql = """INSERT INTO room_reply_record(room_id, reply_id, cnt, add_time, update_time) VALUES(%s, %d, %d, now(), now())"""
+        sql = """INSERT INTO room_reply_record(room_id, reply_id, cnt, add_time, update_time) VALUES(%s, %s, %s, now(), now())"""
         data = (room_id, reply_id, 1)
         cursorEs.execute(sql, data)
         connEs.commit()
     return True
     
-def getAndUpdateWukongReplyWithKeyword(keyword):
-    selectReply = """select id, reply from keyword_reply where keyword = %s and date(update_time) < (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内发过不发
+def getAndUpdateWukongReplyWithKeyword(room_id, keyword):
+    print(f"getAndUpdateWukongReplyWithKeyword|room_id:%s|keyword:%s" % (room_id, keyword))
+    selectReply = """select id, reply from keyword_reply where keyword = %s"""
     selectData = (keyword)
     cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchall()
@@ -473,26 +475,28 @@ async def on_message(msg: Message):
         #reply0 = keyword2reply.get(keyword)
         #InsertKeywordReply(keyword, reply0)
         if (keyword in msg.text()):
-            reply = getAndUpdateWukongReplyWithKeyword(keyword)
+            reply = getAndUpdateWukongReplyWithKeyword(room.room_id, keyword)
             if reply is None:
                 continue
             #reply = keyword2reply.get(keyword)
             print('找到keyword: %s | %s' %(keyword, reply))
-            keyDic = conversationDict.get(conversation_id)
-            if keyDic is None:
-                print('该会话之前未回复')
-                keyDic = {}
-                keyDic[keyword] = 1
-                conversationDict[conversation_id] = keyDic
-                await msg.say(reply)
-                break #一个群一次只回复一个匹配
-            elif keyDic.get(keyword) is None:
-                #print('keyDic:',keyDic.__dict__)
-                print('该会话第一次回复keyword: %s' %(keyword))
-                keyDic[keyword] = 1
-                conversationDict[conversation_id] = keyDic
-                await msg.say(reply)
-                break #一个群一次只回复一个匹配
+            await msg.say(reply)
+            break #一个群一次只回复一个匹配
+            # keyDic = conversationDict.get(conversation_id)
+            # if keyDic is None:
+            #     print('该会话之前未回复')
+            #     keyDic = {}
+            #     keyDic[keyword] = 1
+            #     conversationDict[conversation_id] = keyDic
+            #     await msg.say(reply)
+            #     break #一个群一次只回复一个匹配
+            # elif keyDic.get(keyword) is None:
+            #     #print('keyDic:',keyDic.__dict__)
+            #     print('该会话第一次回复keyword: %s' %(keyword))
+            #     keyDic[keyword] = 1
+            #     conversationDict[conversation_id] = keyDic
+            #     await msg.say(reply)
+            #     break #一个群一次只回复一个匹配
                 
             
 async def on_scan(
