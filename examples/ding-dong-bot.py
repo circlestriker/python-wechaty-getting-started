@@ -272,7 +272,7 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
-#无记录or7天过了都可以
+#无记录or7天过了都可以发
 def updateReplyRecord(room_id, reply_id):
     selectReply = """select id from room_reply_record where room_id = %s and reply_id = %s and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
     selectData = (room_id, reply_id)
@@ -292,6 +292,18 @@ def updateReplyRecord(room_id, reply_id):
         connEs.commit()
     return True
     
+def getAndUpdateWukongReply(room_id): #该群最少发的那个reply
+    print(f"getAndUpdateWukongReply|room_id:%s" % (room_id))
+    selectReply = """select id, reply from keyword_reply where room_id = %s order by cnt limit 1"""
+    selectData = (room_id)
+    cursorEs.execute(selectReply, selectData)
+    rowRes = cursorEs.fetchone()
+    for row in rowRes:
+        if updateReplyRecord(room_id, row[0]):
+            return row[1] 
+    print(f"{keyword} 对应的回复最近7天发过，不再发。")
+    return None
+
 def getAndUpdateWukongReplyWithKeyword(room_id, keyword):
     print(f"getAndUpdateWukongReplyWithKeyword|room_id:%s|keyword:%s" % (room_id, keyword))
     selectReply = """select id, reply from keyword_reply where keyword = %s"""
@@ -301,7 +313,7 @@ def getAndUpdateWukongReplyWithKeyword(room_id, keyword):
     for row in rowRes:
         if updateReplyRecord(room_id, row[0]):
             return row[1] 
-    print("{keyword} 对应的回复最近7天发过，不再发。")
+    print(f"{keyword} 对应的回复最近7天发过，不再发。")
     return None
     
 def getWukongReply():
@@ -312,14 +324,14 @@ def getWukongReply():
     
 async def sendWukongReply(roomId, reply):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("定时发悟空援助url...|{roomId}")
+    print(f"定时发悟空援助url...|{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
-        print("room{roomId} is null !!!")
+        print(f"room{roomId} is null !!!")
         return
     #await msg.say(reply)
-    if reply is not None:
+    if reply is not None and roomId == "17923822738@chatroom":
         await tmpRoom.say(reply)
 
 async def SendWukongAtTime():
@@ -327,9 +339,9 @@ async def SendWukongAtTime():
     """
     cursorEs.execute(selectSql)
     rows = cursorEs.fetchall()
-    reply = getWukongReply(roomId)
     for row in rows:
         roomId = row[0]
+        reply = getWukongReply(roomId)
         sendWukongReply(roomId, reply)
 
     #cnt+1
@@ -348,7 +360,7 @@ def InsertGroupInfo(room_id, room_name):
             return
         
         try:
-            sql = """INSERT INTO group_info(group_id, group_name) VALUES(%s, %s)"""
+            sql = """INSERT INTO group_info(group_id, group_name, add_time, update_time) VALUES(%s, %s, now(), now())"""
             data = (room_id, room_name)
             cursorEs.execute(sql, data)
             connEs.commit()
@@ -469,34 +481,20 @@ async def on_message(msg: Message):
             raise WechatyPayloadError('Message must be from room/contact')
         conversation_id = talker.contact_id
         
-    #replyOnKeyword(conversation_id, msg)
-    time.sleep(3) #避免太快回复
-    for keyword in keyword2reply:
-        #reply0 = keyword2reply.get(keyword)
-        #InsertKeywordReply(keyword, reply0)
-        if (keyword in msg.text()):
-            reply = getAndUpdateWukongReplyWithKeyword(room.room_id, keyword)
-            if reply is None:
-                continue
-            #reply = keyword2reply.get(keyword)
-            print('找到keyword: %s | %s' %(keyword, reply))
-            await msg.say(reply)
-            break #一个群一次只回复一个匹配
-            # keyDic = conversationDict.get(conversation_id)
-            # if keyDic is None:
-            #     print('该会话之前未回复')
-            #     keyDic = {}
-            #     keyDic[keyword] = 1
-            #     conversationDict[conversation_id] = keyDic
-            #     await msg.say(reply)
-            #     break #一个群一次只回复一个匹配
-            # elif keyDic.get(keyword) is None:
-            #     #print('keyDic:',keyDic.__dict__)
-            #     print('该会话第一次回复keyword: %s' %(keyword))
-            #     keyDic[keyword] = 1
-            #     conversationDict[conversation_id] = keyDic
-            #     await msg.say(reply)
-            #     break #一个群一次只回复一个匹配
+    if room is not None: #群才启用
+        #replyOnKeyword(conversation_id, msg)
+        time.sleep(3) #避免太快回复
+        for keyword in keyword2reply:
+            #reply0 = keyword2reply.get(keyword)
+            #InsertKeywordReply(keyword, reply0)
+            if (keyword in msg.text()):
+                reply = getAndUpdateWukongReplyWithKeyword(room.room_id, keyword)
+                if reply is None:
+                    continue
+                #reply = keyword2reply.get(keyword)
+                print('找到keyword: %s | %s' %(keyword, reply))
+                await msg.say(reply)
+                break #一个群一次只回复一个匹配
                 
             
 async def on_scan(
@@ -526,11 +524,13 @@ async def sendMiniProgram(roomId):
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
-        print("room is null !!!")
+        print(f"room {roomId} is null !!!")
         return
     miniProgram = getMiniProgram(roomId)
     if miniProgram is not None:
         await tmpRoom.say(miniProgram)
+    else:
+        print(f"miniProgram of room {roomId} is null !!!")
 
 #circleIdStr: bd-xxxxxxx . xxxxxxx是circleId的base64编码
 def bindCircleAndRoom(circleIdStr, strRoomId):
@@ -584,7 +584,8 @@ async def main():
     print('[Python Wechaty] Ding Dong Bot started.')
 
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=0, hour=20) #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=55, hour=8, args=['19893951839@chatroom']) #ok
+    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=54, hour=8) #ok
     parseCircleBindRoom()
 
     await bot.start()
