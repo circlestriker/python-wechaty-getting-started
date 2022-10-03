@@ -276,33 +276,53 @@ def getMiniProgram(room_id):
 def updateReplyRecord(room_id, reply_id):
     selectReply = """select id from room_reply_record where room_id = %s and reply_id = %s and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
     selectData = (room_id, reply_id)
-    print(type(reply_id))
+    print(f"updateReplyRecord|replyId:{reply_id}")
     cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchone()
     if rowRes is not None:
+        print(f"updateReplyRecord|最近7天发过不能再发|replyId:{reply_id}")
         return False 
     updateReply = """update room_reply_record set cnt = cnt+1, update_time = NOW() where room_id = %s and reply_id = %s""" 
     updateData = (room_id, reply_id)
-    cursorEs.execute(selectReply, selectData)
+    cursorEs.execute(updateReply, updateData)
     connEs.commit()
     if cursorEs.rowcount < 1: # update failed
         sql = """INSERT INTO room_reply_record(room_id, reply_id, cnt, add_time, update_time) VALUES(%s, %s, %s, now(), now())"""
         data = (room_id, reply_id, 1)
         cursorEs.execute(sql, data)
         connEs.commit()
+    IncreKeywordReplyCnt(reply_id)
     return True
     
-def getAndUpdateWukongReply(room_id): #该群最少发的那个reply
-    print(f"getAndUpdateWukongReply|room_id:%s" % (room_id))
-    selectReply = """select id, reply from keyword_reply where room_id = %s order by cnt limit 1"""
-    selectData = (room_id)
+def getAndUpdateWukongReply(groupType): #该group_type最少发的那个reply
+    print(f"getAndUpdateWukongReply|groupType:{groupType}")
+    selectReply = """select id, reply from keyword_reply where group_type = %s order by cnt limit 1"""
+    selectData = (groupType)
     cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchone()
-    for row in rowRes:
-        if updateReplyRecord(room_id, row[0]):
-            return row[1] 
-    print(f"{keyword} 对应的回复最近7天发过，不再发。")
-    return None
+    print(f"{rowRes}")
+    if rowRes is not None:
+        IncreKeywordReplyCnt(rowRes[0])
+        return rowRes[1]
+    else:
+        return None;
+    #     if updateReplyRecord(room_id, rowRes[0]):
+    #         replyId = rowRes[1] 
+    # else:
+    #     row = getAndUpdateWukongReplyWithGroupType(-1)
+    #     if row is not None:
+    #         updateReplyRecord(room_id, row[0])
+    #         replyId = row[1]
+    # print(f"{room_id} 对应的replyId:{replyId}")
+    # return replyId
+
+def getAndUpdateWukongReplyWithGroupType(group_type):
+    print(f"getAndUpdateWukongReplyWithGroupType|group_type:%d" % (group_type))
+    selectReply = """select id, reply from keyword_reply where group_type = %s order by cnt limit 1"""
+    selectData = (group_type)
+    cursorEs.execute(selectReply, selectData)
+    rowRes = cursorEs.fetchone()
+    return rowRes
 
 def getAndUpdateWukongReplyWithKeyword(room_id, keyword):
     print(f"getAndUpdateWukongReplyWithKeyword|room_id:%s|keyword:%s" % (room_id, keyword))
@@ -316,15 +336,19 @@ def getAndUpdateWukongReplyWithKeyword(room_id, keyword):
     print(f"{keyword} 对应的回复最近7天发过，不再发。")
     return None
     
-def getWukongReply():
-    selectReply = """select reply from keyword_reply where group_type = 0 order by cnt limit 1"""
-    cursorEs.execute(selectReply)
+def getWukongReplyById(replyId):
+    selectReply = """select reply from keyword_reply where id = %s"""
+    selectData = (replyId)
+    cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchone()
-    return rowRes[0]
+    if rowRes is None:
+        return None
+    else:
+        return rowRes[0]
     
 async def sendWukongReply(roomId, reply):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print(f"定时发悟空援助url...|{roomId}")
+    print(f"准备|定时发悟空援助url|{roomId}|{reply}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
@@ -332,6 +356,7 @@ async def sendWukongReply(roomId, reply):
         return
     #await msg.say(reply)
     if reply is not None and roomId == "17923822738@chatroom":
+        print(f"确认|定时发悟空援助url|{roomId}|{reply}")
         await tmpRoom.say(reply)
 
 async def SendWukongAtTime():
@@ -341,10 +366,17 @@ async def SendWukongAtTime():
     rows = cursorEs.fetchall()
     for row in rows:
         roomId = row[0]
-        reply = getWukongReply(roomId)
-        sendWukongReply(roomId, reply)
+        reply = getAndUpdateWukongReply(-1) #getWukongReply(roomId)
+        if reply is not None:
+            await sendWukongReply(roomId, reply)
 
-    #cnt+1
+#cnt+1
+def IncreKeywordReplyCnt(replyId):
+    updateReply = """update keyword_reply set cnt = cnt+1, update_time = NOW() where id = %s""" 
+    updateData = (replyId)
+    cursorEs.execute(updateReply, updateData)
+    connEs.commit()
+    
     
 def InsertGroupInfo(room_id, room_name):
     if "渡过" in room_name or '悟空援助' in room_name or '一休治郁' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
@@ -356,7 +388,7 @@ def InsertGroupInfo(room_id, room_name):
         cursorEs.execute(selectSql, selectData)
         resRow = cursorEs.fetchone()
         if resRow is not None:
-            print("insert before!! | {room_id}")
+            print(f"insert before!! | {room_id}")
             return
         
         try:
@@ -520,7 +552,7 @@ async def on_login(user: Contact):
 #<Room <22958121966@chatroom - 斑猪运营群>> set payload more than once
 async def sendMiniProgram(roomId):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("定时发活动...{roomId}")
+    print(f"定时发活动...{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
     if tmpRoom is None:
@@ -583,9 +615,10 @@ async def main():
     bot.on('message',   on_message)
     print('[Python Wechaty] Ding Dong Bot started.')
 
+    #scheduler.add_job(SendWukongAtTime, "interval", seconds=120) #ok
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=55, hour=8, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=54, hour=8) #ok
+    #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=53, hour=11, args=['19893951839@chatroom'], misfire_grace_time=30) 
+    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=8, hour=16, misfire_grace_time=30) 
     parseCircleBindRoom()
 
     await bot.start()
