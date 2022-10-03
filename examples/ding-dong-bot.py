@@ -590,50 +590,5 @@ async def main():
     await bot.start()
 
 
-class ServerThreading(threading.Thread):
-    def __init__(self,clientsocket,recvsize=1024*1024,encoding="utf-8"):
-        threading.Thread.__init__(self)
-        self._socket = clientsocket
-        self._recvsize = recvsize
-        self._encoding = encoding
-        pass
-
-    def run(self):
-        print("开启线程.....")
-        try: #接受数据
-            msg = ''
-            get1stframe = 1
-            bTest = 0
-            while True:
-                # 读取recvsize个字节
-                rec = self._socket.recv(self._recvsize)
-                # 解码
-                msg += rec.decode(self._encoding)
-
-                if msg.strip().endswith('test'): #测试test/开发dev环境的最后4个字节必须传test
-                    msg=msg[:-4] #去掉尾部的'test'
-                    bTest = 1
-                # 文本接受是否完毕，因为python socket不能自己判断接收数据是否完毕，
-                # 所以需要自定义协议标志数据接受完毕
-                if msg.strip().endswith('over-1stframe'):
-                    sendMiniProgram()
-                    break
-
-            # 发送数据
-            self._socket.send(("%s"%sendmsg).encode(self._encoding))
-            pass
-        except Exception as identifier:
-            self._socket.send("500".encode(self._encoding))
-            print(identifier)
-            pass
-        finally:
-            self._socket.close()
-        print("任务结束.....")
-
-        pass
-
-    def __del__(self):
-        pass                    
-
 asyncio.run(main())
 
