@@ -244,11 +244,9 @@ def parseCircleBindRoom():
         print(hour1)
         print(hour2)
         #print(f"{%s} {%s} {%s}" % (hour0, hour1, hour2))
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour1, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour2, args=[roomId]) #ok
+        #scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
 
-    scheduler.start()
+    scheduler.start() #needed
 
     
 
@@ -355,7 +353,7 @@ async def sendWukongReply(roomId, reply):
         print(f"room{roomId} is null !!!")
         return
     #await msg.say(reply)
-    if reply is not None and roomId == "17923822738@chatroom":
+    if reply is not None: # and roomId == "17923822738@chatroom":
         print(f"确认|定时发悟空援助url|{roomId}|{reply}")
         await tmpRoom.say(reply)
 
@@ -366,7 +364,7 @@ async def SendWukongAtTime():
     rows = cursorEs.fetchall()
     for row in rows:
         roomId = row[0]
-        reply = getAndUpdateWukongReply(-1) #getWukongReply(roomId)
+        reply = getAndUpdateWukongReply(0) #getWukongReply(roomId)
         if reply is not None:
             await sendWukongReply(roomId, reply)
 
@@ -550,8 +548,9 @@ async def on_login(user: Contact):
 
     
 #<Room <22958121966@chatroom - 斑猪运营群>> set payload more than once
-async def sendMiniProgram(roomId):
+async def sendMiniProgram():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    roomId = '19893951839@chatroom'
     print(f"定时发活动...{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
@@ -560,6 +559,7 @@ async def sendMiniProgram(roomId):
         return
     miniProgram = getMiniProgram(roomId)
     if miniProgram is not None:
+        print(f"现在发小程序|{roomId}|{miniProgram}")
         await tmpRoom.say(miniProgram)
     else:
         print(f"miniProgram of room {roomId} is null !!!")
@@ -615,10 +615,10 @@ async def main():
     bot.on('message',   on_message)
     print('[Python Wechaty] Ding Dong Bot started.')
 
-    #scheduler.add_job(SendWukongAtTime, "interval", seconds=120) #ok
+    #scheduler.add_job(sendMiniProgram, "interval", seconds=120) #ok
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=53, hour=11, args=['19893951839@chatroom'], misfire_grace_time=30) 
-    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=8, hour=16, misfire_grace_time=30) 
+    #scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=29, hour=22, misfire_grace_time=30) 
     parseCircleBindRoom()
 
     await bot.start()
