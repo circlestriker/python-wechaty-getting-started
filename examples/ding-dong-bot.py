@@ -244,7 +244,9 @@ def parseCircleBindRoom():
         print(hour1)
         print(hour2)
         #print(f"{%s} {%s} {%s}" % (hour0, hour1, hour2))
-        #scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour1, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour2, args=[roomId]) #ok
 
     scheduler.start() #needed
 
@@ -548,9 +550,8 @@ async def on_login(user: Contact):
 
     
 #<Room <22958121966@chatroom - 斑猪运营群>> set payload more than once
-async def sendMiniProgram():
+async def sendMiniProgram(roomId):
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    roomId = '19893951839@chatroom'
     print(f"定时发活动...{roomId}")
     # 等待登入
     tmpRoom = await bot.Room.find(roomId)  # 可以根据 room 的 topic 和 id 进行查找
@@ -617,9 +618,8 @@ async def main():
 
     scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
     
-    #scheduler.add_job(sendMiniProgram, "interval", seconds=120) #ok
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=42, hour=8, misfire_grace_time=30) 
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=55, hour=8, misfire_grace_time=10, args=['19893951839@chatroom']) 
     parseCircleBindRoom()
 
     await bot.start()
