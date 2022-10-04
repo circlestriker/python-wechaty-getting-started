@@ -615,10 +615,11 @@ async def main():
     bot.on('message',   on_message)
     print('[Python Wechaty] Ding Dong Bot started.')
 
+    scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
+    
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120) #ok
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    #scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=29, hour=22, misfire_grace_time=30) 
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=42, hour=8, misfire_grace_time=30) 
     parseCircleBindRoom()
 
     await bot.start()
