@@ -234,19 +234,17 @@ def parseCircleBindRoom():
     cursor.execute(selectSql)
     rows = cursor.fetchall()
     for row in rows:
-        print(f'---------{row[0]} {row[1]} {row[2]}')
+        print(f'{row[0]}|circleId: {row[1]}|circleCode: {row[2]}')
         roomId = row[3]
         print(roomId)
         hour0 = row[4]
         hour1 = row[5]
         hour2 = row[6]
-        print(hour0)
-        print(hour1)
-        print(hour2)
-        #print(f"{%s} {%s} {%s}" % (hour0, hour1, hour2))
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour0, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour1, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", hour=hour2, args=[roomId]) #ok
+        print(f"要发的小时节点:{hour0}|{hour1}|{hour2}")
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour0, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour1, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour2, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=11, misfire_grace_time=30, args=['19893951839@chatroom']) 
 
     scheduler.start() #needed
 
@@ -611,7 +609,7 @@ async def main():
     scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
     
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=18, hour=10, misfire_grace_time=30, args=['19893951839@chatroom']) 
+    #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=59, hour=10, misfire_grace_time=30, args=['19893951839@chatroom']) 
     parseCircleBindRoom()
 
     await bot.start()
