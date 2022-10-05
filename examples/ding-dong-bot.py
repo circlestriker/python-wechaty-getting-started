@@ -306,15 +306,6 @@ def getAndUpdateWukongReply(groupType): #该group_type最少发的那个reply
         return rowRes[1]
     else:
         return None;
-    #     if updateReplyRecord(room_id, rowRes[0]):
-    #         replyId = rowRes[1] 
-    # else:
-    #     row = getAndUpdateWukongReplyWithGroupType(-1)
-    #     if row is not None:
-    #         updateReplyRecord(room_id, row[0])
-    #         replyId = row[1]
-    # print(f"{room_id} 对应的replyId:{replyId}")
-    # return replyId
 
 def getAndUpdateWukongReplyWithGroupType(group_type):
     print(f"getAndUpdateWukongReplyWithGroupType|group_type:%d" % (group_type))
@@ -561,6 +552,7 @@ async def sendMiniProgram(roomId):
     miniProgram = getMiniProgram(roomId)
     if miniProgram is not None:
         print(f"现在发小程序|{roomId}|{miniProgram}")
+        await tmpRoom.say("请打开链接报名：https://wxaurl.cn/tIZgboNm2Zm")
         await tmpRoom.say(miniProgram)
     else:
         print(f"miniProgram of room {roomId} is null !!!")
@@ -573,10 +565,10 @@ def bindCircleAndRoom(circleIdStr, strRoomId):
     strCircleId = base64.b64decode(circleIdBase64)
     circleId = int(strCircleId) 
     if circleId == -1:
-        print("circleIs == -1 !!!")
+        print(f"circleId == -1 !!!|{strRoomId}|{circleIdStr}")
         return
     try:
-        sql = """INSERT INTO banzhu_circle_chatgroup(circleId, chatGroupCode) VALUES(%d, %s)"""
+        sql = """INSERT INTO banzhu_circle_chatgroup(circleId, chatGroupCode) VALUES(%s, %s)"""
         data = (circleId, strRoomId)
         cursor.execute(sql, data)
         conn.commit()
@@ -619,7 +611,7 @@ async def main():
     scheduler.add_job(SendWukongAtTime, "cron", day="*", minute=26, hour=19, misfire_grace_time=30)  #ok
     
     #scheduler.add_job(sendMiniProgram, "interval", seconds=120, args=['19893951839@chatroom']) #ok
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=55, hour=8, misfire_grace_time=10, args=['19893951839@chatroom']) 
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=18, hour=10, misfire_grace_time=30, args=['19893951839@chatroom']) 
     parseCircleBindRoom()
 
     await bot.start()
