@@ -237,15 +237,15 @@ def parseCircleBindRoom():
         print(f'{row[0]}|circleId: {row[1]}|circleCode: {row[2]}')
         roomId = row[3]
         print(roomId)
-        hour0 = row[4]
-        hour1 = row[5]
-        hour2 = row[6]
-        print(f"要发的小时节点:{hour0}|{hour1}|{hour2}")
+        hour0 = int(row[4])
+        hour1 = int(row[5])
+        hour2 = int(row[6])
+        print(f"{roomId}要发的小时节点:{hour0}|{hour1}|{hour2}")
         scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour0, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour1, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour2, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=11, misfire_grace_time=30, args=['19893951839@chatroom']) 
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
 
+    #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=42, hour=21, misfire_grace_time=30, args=['19893951839@chatroom']) 
     scheduler.start() #needed
 
     
