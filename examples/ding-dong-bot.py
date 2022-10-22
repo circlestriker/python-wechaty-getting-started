@@ -241,9 +241,9 @@ def parseCircleBindRoom():
         hour1 = int(row[5])
         hour2 = int(row[6])
         print(f"{roomId}要发的小时节点:{hour0}|{hour1}|{hour2}")
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=1, hour=hour0, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=18, hour=hour0+4, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1+9, misfire_grace_time=30, args=[roomId]) #ok
+        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=50, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
 
     #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=42, hour=21, misfire_grace_time=30, args=['19893951839@chatroom']) 
     scheduler.start() #needed
@@ -274,7 +274,8 @@ def getMiniProgram(room_id):
 def updateReplyRecord(room_id, reply_id):
     selectReply = """select id from room_reply_record where room_id = %s and reply_id = %s and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
     selectData = (room_id, reply_id)
-    print(f"updateReplyRecord|replyId:{reply_id}")
+    localtime = time.asctime( time.localtime(time.time()) )
+    print(f"{localtime}|updateReplyRecord|replyId:{reply_id}")
     cursorEs.execute(selectReply, selectData)
     rowRes = cursorEs.fetchone()
     if rowRes is not None:
@@ -415,7 +416,8 @@ async def on_message(msg: Message):
         talker: Contact = msg.talker()
         await talker.ready()
         if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name or '2002届高三' in room_name:
-            print(f"发消息的是郁金香等, 直接return")
+            localtime = time.asctime( time.localtime(time.time()) )
+            print(f"{localtime}|发消息的是郁金香等, 直接return")
             return
         
         InsertGroupInfo(room.room_id, room_name)
@@ -425,7 +427,8 @@ async def on_message(msg: Message):
             mini_program = await msg.to_mini_program()
             # save the mini-program data as string
             mini_program_data = asdict(mini_program.payload)
-            print('str of mini:', mini_program_data)
+            localtime = time.asctime( time.localtime(time.time()) )
+            print(f"{localtime}|str of mini:", mini_program_data)
             appName = mini_program_data.get('description')
             if "斑猪活动圈" in appName: #斑猪小程序才入db
                 # 插入db
@@ -551,7 +554,7 @@ async def sendMiniProgram(roomId):
     if miniProgram is not None:
         print(f"现在发小程序|{roomId}|{miniProgram}")
         await tmpRoom.say("请打开链接报名：https://wxaurl.cn/tIZgboNm2Zm")
-        await tmpRoom.say(miniProgram)
+        #await tmpRoom.say(miniProgram)
     else:
         print(f"miniProgram of room {roomId} is null !!!")
 
