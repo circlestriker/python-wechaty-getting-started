@@ -227,6 +227,167 @@ banzhuRoom = None
 
 bot: Optional[Wechaty] = None
 
+# 生成活动文本链接
+def gen_action_textlink(db, actionId):
+    action = _load_action_byid(db, actionId)
+    baolist = _load_action_baolist(db, action['comboId'])
+    textlink = _gen_action_textlink(action, baolist)
+    return textlink
+
+# 生成圈子里可用活动s的文本链接
+def gen_circle_actions_textlink(db, circleId):
+    textlinks = []
+    actions = _load_circle_active_actions(db, circleId)
+    for action in actions:
+        baolist = _load_action_baolist(db, action['comboId'])
+        textlink = _gen_action_textlink(action, baolist)
+        textlinks.append(textlink)
+    return textlinks
+
+# 根据活动信息和报名名单生成活动的文本链接
+def _gen_action_textlink(action, baolist):
+    title, address, addressName, peopleNum = action['title'], action['address'], action['addressName'], action['peopleNum']
+    actionTime, actionEndTime, signUpEndTime = action['actionTime'], action['actionEndTime'], action['signUpEndTime']
+    feeType, condition, description = action['feeType'], action['condition'], action['description']
+    actionTimeStr = _fmt_datetimes(actionTime, actionEndTime)
+    addressStr = '📍%s\n📍%s'%(address, addressName) if address>'' else '线下活动'
+    feeStr = _fmt_fees(feeType, condition)
+    text_action = '【%s】\n⏱%s\n%s\n%s\n'%(title, actionTimeStr, addressStr, feeStr)
+    bao_len = len(baolist)
+    bao_limit = '不限' if (peopleNum <= 0 or peopleNum >= 9999) else peopleNum
+    text_baohead = '【报名 %d/%s】'%(bao_len, bao_limit)
+    text_baolist = ''
+    for bao in baolist:
+        baono, nick = bao['baono'], bao['nick']
+        text_baolist = text_baolist+'%d、%s\r\n'%(baono, nick)
+    endTimeStr = signUpEndTime.strftime("%m月%d日 %H点%M分")
+    text_endtime = '❗报名截止时间：%s'%(endTimeStr)
+    text_desc = '【活动说明】\r\n%s'%(description)
+    text_more = '\n更多内容点击下方链接👇👇👇\n\n（请勿直接接龙）打开链接报名：'
+    text_more += _fetch_urllink(action['actionId'])
+    text_link = '%s\n%s\n%s\n%s\n\n%s\n%s'%(text_action, text_baohead, text_baolist, text_endtime, text_desc, text_more)
+    return text_link
+
+#
+def _fmt_datetimes(actionTime, actionEndTime):
+    weeks = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    fmt = "%m月%d日（{week}） %H:%M"
+    timeStr = actionTime.strftime(fmt).format(week=weeks[actionTime.weekday()])
+    sameday = (actionTime.year == actionEndTime.year and actionTime.month == actionEndTime.month and actionTime.day == actionEndTime.day)
+    timeStr += ' ~ ' + (actionEndTime.strftime("%H:%M") if sameday else actionEndTime.strftime(fmt).format(week=weeks[actionEndTime.weekday()]))
+    return timeStr
+
+# 生成费用文本信息
+def _fmt_fees(feeType, condition):
+    feeStr = '免费' if feeType==2 \
+        else '报名后付费' if feeType==1 \
+        else '报名时付费'
+        # else '💰' if condition<2 \
+    return '💰'+feeStr
+
+
+# 根据活动id获取活动信息
+def _load_action_byid(db, actionId):
+    fields = ['actionId', 'comboId', 'title', 'address', 'addressName', 'peopleNum'
+    , 'createTime', 'actionTime', 'actionEndTime', 'signUpEndTime'
+    ,'feeType' , 'condition', 'enableTeam', 'description']
+    sql = '''
+SELECT ac.actionId, ac.id AS comboId, ac.title, ac.address, ac.addressName, ac.peopleNum
+     , ac.createTime, ac.actionTime, ac.actionEndTime, ac.signUpEndTime
+     , ac.type as feeType, ac.condition, ac.enableTeam, i.description
+FROM banzhu_action a
+JOIN banzhu_action_combo ac ON a.id = ac.actionId AND ac.sub = 0 #只要主活动
+LEFT JOIN banzhu_action_introduction i ON i.comboId = ac.id AND i.delete = 0 AND i.description > ''
+WHERE a.delete = 0 AND a.isdraft = 0 AND ac.delete = 0 AND ac.hasCancel = 0 #有效的活动
+  AND ac.actionEndTime > NOW() #未结束的活动
+  AND a.id = %d
+ORDER BY ac.createTime;    
+'''%(actionId)
+    cursor = db.cursor()
+    row = {}
+    try:
+        res = cursor.execute(sql)
+        print('banzhu._load_action_byid(actionId=%d)'%(actionId), res)
+        tup = cursor.fetchone()
+        row = {fields[i]: tup[i] for i in range(len(tup))}
+    except Exception as err:
+        print('Got error {!r}, errno is {}'.format(err, err.args[0]))
+    return row
+
+# 根据圈子id获取未结束的活动
+def _load_circle_active_actions(db, circleId):
+    fields = ['circleId', 'actionId', 'comboId', 'title', 'address', 'addressName', 'peopleNum'
+    , 'createTime', 'actionTime', 'actionEndTime', 'signUpEndTime'
+    ,'feeType' , 'condition', 'enableTeam', 'description']
+    sql = '''
+SELECT a.circleId, ac.actionId, ac.id AS comboId, ac.title, ac.address, ac.addressName, ac.peopleNum
+     , ac.createTime, ac.actionTime, ac.actionEndTime, ac.signUpEndTime
+     , ac.type as feeType, ac.condition, ac.enableTeam, i.description
+FROM banzhu_circle c 
+JOIN banzhu_action a ON c.id = a.circleId
+JOIN banzhu_action_combo ac ON a.id = ac.actionId AND ac.sub = 0 #只要主活动
+LEFT JOIN banzhu_action_introduction i ON i.comboId = ac.id AND i.delete = 0 AND i.description > ''
+WHERE a.delete = 0 AND a.isdraft = 0 AND ac.delete = 0 AND ac.hasCancel = 0 #有效的活动
+  AND ac.actionEndTime > NOW() #未结束的活动
+  AND c.id = %d #圈子id
+ORDER BY ac.createTime;    
+'''%(circleId)
+    cursor = db.cursor()
+    rows = []
+    try:
+        res = cursor.execute(sql)
+        print('banzhu._load_circle_active_actions(circleId=%d)'%(circleId), res)
+        for tup in cursor:
+            row = {fields[i]: tup[i] for i in range(len(tup))}
+            rows.append(row)
+    except Exception as err:
+        print('Got error {!r}, errno is {}'.format(err, err.args[0]))
+    return rows
+
+# 根据活动卡片id获取报名名单
+def _load_action_baolist(db, comboId):
+    fields = ['s', 'createTime', 'id', 'uid', 'nick', 'gender', 'forUid', 'forName', 'forGender', 'inviter', 'baono', 'delete', 'candidate']
+    sql = '''
+SELECT IF(b.delete, 2, b.candidate) AS s #状态: 0-正常报名, 1-候补, 2-取消报名
+     , b.createTime, b.id, b.uid, u.nick, u.gender, b.forUid, b.forName, b.forGender, b.inviter
+     , IF(b.delete>0, RANK() OVER (ORDER BY b.delete DESC, b.updateTime, b.id), IF(b.candidate>0, RANK() OVER (ORDER BY IF(b.delete>0,0,b.candidate) DESC, b.createtime DESC, b.id DESC), RANK() OVER (ORDER BY b.candidate, b.delete, b.createtime, b.id))) baono #报名顺序号
+     , b.delete, b.candidate
+FROM banzhu_action_bao_combo b
+LEFT JOIN banzhu_action_combo ac ON ac.id=b.comboid
+LEFT JOIN banzhu_user u ON b.uid=u.uid
+WHERE b.comboId = %d #活动卡片id
+  AND b.delete = 0 #是否取消报名
+ORDER BY  s, baono, b.createtime, b.id;
+'''%(comboId)
+    cursor = db.cursor()
+    try:
+        res = cursor.execute(sql)
+        print('banzhu._load_action_baolist(comboId=%d)'%(comboId),  res)
+        rows = []
+        for tup in cursor:
+            row = {fields[i]: tup[i] for i in range(len(tup))}
+            rows.append(row)
+        return rows
+    except Exception as err:
+        print('Got error {!r}, errno is {}'.format(err, err.args[0]))
+    return []
+
+# 生成活动url链接
+def _fetch_urllink(actionId):
+    url = 'https://banzhu.udinovo.com/banzhu/weixin/getUrllink'
+    data = {
+        'path': '/pages/index/index',
+        'query': 'share=activityDetail&params='+requests.utils.quote('actionId=%d&type=0'%(actionId))
+    }
+    try:
+        res = requests.post(url, data = data, timeout=5)
+        print('banzhu._fetch_urllink(actionId=%d)'%(actionId), res)
+        json = res.json()
+        return json['url_link']
+    except Exception as err:
+        print('Got error {!r}, errno is {}'.format(err, err.args[0]))
+        return ''
+
 def parseCircleBindRoom():
     selectSql = """select name, circleId, circleCode, chatGroupCode, timing->'$[0]', timing->'$[1]',timing->'$[2]',keywords from banzhu_circle_chatgroup where enable = 1 ORDER BY id DESC
     """
@@ -241,14 +402,26 @@ def parseCircleBindRoom():
         hour1 = int(row[5])
         hour2 = int(row[6])
         print(f"{roomId}要发的小时节点:{hour0}|{hour1}|{hour2}")
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=18, hour=hour0+4, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1+9, misfire_grace_time=30, args=[roomId]) #ok
-        scheduler.add_job(sendMiniProgram, "cron", day="*", minute=50, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
+        # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=18, hour=hour0+4, misfire_grace_time=30, args=[roomId]) #ok
+        # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1+9, misfire_grace_time=30, args=[roomId]) #ok
+        # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=50, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
 
-    #scheduler.add_job(sendMiniProgram, "cron", day="*", minute=42, hour=21, misfire_grace_time=30, args=['19893951839@chatroom']) 
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=54, hour=10, misfire_grace_time=30, args=['19893951839@chatroom']) 
     scheduler.start() #needed
 
-    
+            
+def getActivityId(room_id):
+    #属于这个群的有效的活动, 暂取最后一个
+    selectSql = """select activity_id from mini_program where group_id = %s ORDER BY id DESC LIMIT 1
+    """
+    selectData = (room_id)
+    cursor.execute(selectSql, selectData)
+    resRow = cursor.fetchone()
+    activityId = None
+    if resRow is not None:
+        activityId = resRow[0]
+    return activityId 
+
 
 def getMiniProgram(room_id):
     #属于这个群的有效的活动, 暂取最后一个
@@ -369,7 +542,7 @@ def IncreKeywordReplyCnt(replyId):
     
     
 def InsertGroupInfo(room_id, room_name):
-    if "渡过" in room_name or '悟空援助' in room_name or '一休治郁' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
+    if "公益" in room_name or "书香" in room_name or "渡过" in room_name or '悟空援助' in room_name or '一休' in room_name or '郁金香' in room_name or '七日离苦' in room_name\
         or "抑郁症" in room_name or "走向开心" in room_name:
         print(f"InsertGroupInfo|群: {room_name}")
         # 先查询，有就不insert
@@ -415,7 +588,7 @@ async def on_message(msg: Message):
         room_name = await room.topic()
         talker: Contact = msg.talker()
         await talker.ready()
-        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name or '2002届高三' in room_name:
+        if "郁金香" in talker.name or "寒啸" in talker.name or room_name == "7线内部群" or "TDD" in room_name or "中大深圳" in room_name or '2002届高三' in room_name:
             localtime = time.asctime( time.localtime(time.time()) )
             print(f"{localtime}|发消息的是郁金香等, 直接return")
             return
@@ -470,24 +643,6 @@ async def on_message(msg: Message):
                     
         if "斑猪" in room_name and "活动" in msg.text():
             print(f"斑猪活动报名")
-    #         await msg.say('''【得闲打球】
-    # ⏱07/20 周三 | 13:29 至 08/21 周四 | 13:29
-    # 📍杨协成时尚工场A座协爽(海珠区赤岗西路)
-    # 📍广东省广州市海珠区江贝安定里
-    # 💰报名后付费
-
-    # 【报名 1/不限】
-    # 1、弯腰捡球爱好者 🌹
-    # 2、
-    # 3、
-
-    # ❗报名截止时间：2022-8-20 13:29:00
-
-
-    # 更多内容点击下方链接👇👇👇
-
-    # （请勿直接接龙）打开链接报名：https://wxaurl.cn/tIZgboNm2Zm''')
-
             miniProgram = getMiniProgram(room.room_id)
             if miniProgram is not None:
                 global banzhuRoom
@@ -550,10 +705,12 @@ async def sendMiniProgram(roomId):
     if tmpRoom is None:
         print(f"room {roomId} is null !!!")
         return
-    miniProgram = getMiniProgram(roomId)
-    if miniProgram is not None:
-        print(f"现在发小程序|{roomId}|{miniProgram}")
-        await tmpRoom.say("请打开链接报名：https://wxaurl.cn/tIZgboNm2Zm")
+    activityId = getActivityId(roomId)
+    if activityId is not None:
+        print(f"现在发小程序|{roomId}|活动id: {activityId}")
+        textlink = gen_action_textlink(conn, activityId)
+        await tmpRoom.say(textlink)
+        #await tmpRoom.say("请打开链接报名：https://wxaurl.cn/tIZgboNm2Zm")
         #await tmpRoom.say(miniProgram)
     else:
         print(f"miniProgram of room {roomId} is null !!!")
