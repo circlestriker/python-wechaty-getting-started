@@ -406,7 +406,7 @@ def parseCircleBindRoom():
         # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=3, hour=hour1+9, misfire_grace_time=30, args=[roomId]) #ok
         # scheduler.add_job(sendMiniProgram, "cron", day="*", minute=50, hour=hour2+2, misfire_grace_time=30, args=[roomId]) #ok
 
-    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=54, hour=10, misfire_grace_time=30, args=['19893951839@chatroom']) 
+    scheduler.add_job(sendMiniProgram, "cron", day="*", minute=21, hour=11, misfire_grace_time=30, args=['19893951839@chatroom']) 
     scheduler.start() #needed
 
             
@@ -705,7 +705,8 @@ async def sendMiniProgram(roomId):
     if tmpRoom is None:
         print(f"room {roomId} is null !!!")
         return
-    activityId = getActivityId(roomId)
+    #activityId = getActivityId(roomId)
+    activityId = 6886
     if activityId is not None:
         print(f"现在发小程序|{roomId}|活动id: {activityId}")
         textlink = gen_action_textlink(conn, activityId)
