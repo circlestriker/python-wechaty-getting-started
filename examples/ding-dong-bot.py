@@ -443,6 +443,18 @@ def getMiniProgram(room_id):
         )
     return miniProgram
 
+def replyInLastHour(room_id):
+    selectReply = """select id from room_reply_record where room_id = %s and date(update_time) > (CURDATE() - INTERVAL 1 HOUR)  order by cnt limit 1""" # 7天内是否发过
+    selectData = (room_id)
+    localtime = time.asctime( time.localtime(time.time()) )
+    print(f"{localtime}|check之前1小时是否有回复改群|replyInLastHour|roomId:{room_id}")
+    cursorEs.execute(selectReply, selectData)
+    rowRes = cursorEs.fetchone()
+    if rowRes is not None:
+        print(f"{localtime}|之前1小时有回复改群|replyInLastHour|roomId:{room_id}")
+        return True
+    return False 
+
 #无记录or7天过了都可以发
 def updateReplyRecord(room_id, reply_id):
     selectReply = """select id from room_reply_record where room_id = %s and reply_id = %s and date(update_time) > (CURDATE() - INTERVAL 7 DAY)  order by cnt limit 1""" # 7天内是否发过
@@ -661,12 +673,15 @@ async def on_message(msg: Message):
         conversation_id = talker.contact_id
         
     if room is not None: #群才启用
+        if replyInLastHour(room.room_id):
+            return 
         #replyOnKeyword(conversation_id, msg)
         time.sleep(3) #避免太快回复
         for keyword in keyword2reply:
             #reply0 = keyword2reply.get(keyword)
             #InsertKeywordReply(keyword, reply0)
             if (keyword in msg.text()):
+                #该群1小时内回复过其他keyword，不再回复
                 reply = getAndUpdateWukongReplyWithKeyword(room.room_id, keyword)
                 if reply is None:
                     continue
